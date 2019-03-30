@@ -1,5 +1,5 @@
 function [result] = lab2(input)
 x=input;
 result=x;
-% Test test
+% Test test 2 -  Nina
 end
