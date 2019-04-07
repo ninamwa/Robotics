@@ -6,7 +6,6 @@
 %
 % adapted to Octave- Joao Sequeira, 2019
 % switch off the MATLAB variable if used in  Octave
-% Charlotte Heggem, Nina Marie Wahl, Ophelia Priliard
 MATLAB = 0;
 
 
