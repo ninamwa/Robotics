@@ -17,19 +17,25 @@ global odometry;
 global door_detected;
 door_detected = false;
 cont = true;
-while cont
-    if door_detected
-        true_door = searchQR();
-        if true_door
-            status = get_door_status();
-            %Turn 90degrees
-            playSound(status);
+reference_path=PathPlanner(); 
+for i = 1:length(reference_path(:,1))
+    ref = reference_path(i,:);
+    while norm(odometry(1:2)-ref)>0.5
+        if door_detected
+            true_door = searchQR();
+            if true_door
+                %Turn 90degrees
+                status = get_door_status();
+                playSound(status);
+            end
+            door_detected=false;
+        else 
+            odom = pioneer_read_odometry();
+            [v,w] = control_system(odom,ref);
+            pioneer_set_controls(v,w);
+            %robot_control along trajectory from saved position
+            %end of path reached: cont = false;
         end
-        door_detected=false;
-    else 
-        %pioneer_set_controls();
-        %robot_control along trajectory from saved position
-        %end of path reached: cont = false;
     end
 end
 
@@ -62,6 +68,7 @@ end
 function lidartimerCallback(src, event)
     global rangescan;
     global door_detected;
+    global odometry;
     threshold = 60;
     left = [];
     right = [];
