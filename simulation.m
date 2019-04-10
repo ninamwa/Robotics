@@ -23,17 +23,29 @@ q_obs2(1) = q_obs(1,3);
 k=1;
 for k1 = 1:length(x),
     q_ref = [x(k1),y(k1)];
+    theta_r = atan2(q_ref(2),q_ref(1));
+    
+    
     
     while norm(q_obs(k,1:2)-q_ref)>0.5,
+        theta = q_obs(k,3);
         e(k)=norm(q_ref - q_obs(k,1:2));
-        phi(k)=atan2(q_ref(2)-q_obs(k,2),q_ref(1)-q_obs(k,1));
-        alpha(k) = phi(k) - q_obs(k,3);
+        phi(k)=atan2(q_ref(2)-q_obs(k,2),q_ref(1)-q_obs(k,1))-theta_r;
+        
+        if phi(k)>pi
+            phi(k) = phi(k)-2*pi;
+        elseif phi(k) < -pi
+            phi(k) = phi(k) + 2*pi;
+        end
+        
+        alpha(k) = phi(k) - theta+theta_r;
         
         if alpha(k)>pi
             alpha(k) = alpha(k)-2*pi;
         elseif alpha(k) < -pi
             alpha(k) = alpha(k) + 2*pi;
         end
+        
         
         K1 = 1;
         K2 = 1;
@@ -46,12 +58,7 @@ for k1 = 1:length(x),
         q(k+1,2) = q(k,2) + h*sin(q(k,3))*v(k);
         q(k+1,3) = q(k,3) + h*w(k);
         
-        
-        if(q(k+1,3)>pi)
-            q(k+1,3)=q(k+1,3)-2*pi;
-        elseif (q(k+1,3)<-pi)
-            q(k+1,3)=q(k+1,3)+2*pi;
-        end  
+       
         q_obs(k+1,:) = q(k+1,:);
         
         

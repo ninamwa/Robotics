@@ -1,4 +1,8 @@
 function lab2()
+delete(timerfindall);
+sp = serial_port_start();
+pioneer_init(sp);
+
 
 lidartmr = timer('ExecutionMode', 'FixedRate', ...
     'Period', 1, ...
@@ -11,15 +15,17 @@ odometrytmr = timer('ExecutionMode', 'FixedRate', ...
     'StartFcn',{@initOdometry}, ...
     'TimerFcn', {@odometrytimerCallback});
 
-start(lidartmr);
+%start(lidartmr);
 start(odometrytmr);
 global odometry;
 global door_detected;
 door_detected = false;
-cont = true;
+
 reference_path=PathPlanner(); 
 for i = 1:length(reference_path(:,1))
     ref = reference_path(i,:);
+    disp(odometry)
+    disp(ref)
     while norm(odometry(1:2)-ref)>0.5
         if door_detected
             true_door = searchQR();
@@ -30,17 +36,16 @@ for i = 1:length(reference_path(:,1))
             end
             door_detected=false;
         else 
-            odom = pioneer_read_odometry();
-            [v,w] = control_system(odom,ref);
-            pioneer_set_controls(v,w);
-            %robot_control along trajectory from saved position
-            %end of path reached: cont = false;
+            res = control_system(odometry,ref);
+            pioneer_set_controls(sp,res(1),res(2));
         end
     end
 end
 
 delete(lidartmr);
 delete(odometrytmr);
+pioneer_close(sp);
+serial_port_stop(sp);
 end
 
 function door_true = searchQR()
@@ -92,5 +97,5 @@ function lidartimerCallback(src, event)
 end
 function odometrytimerCallback(src, event)
     global odometry;
-    %odometry = pioneer_read_odometry();
+    odometry = pioneer_read_odometry();
 end
