@@ -10,7 +10,11 @@ MATLAB = 0;
 
 
 if MATLAB
-    lidar=serial('COM3','baudrate',115200); % serial('/dev/tty.KeySerial1') for mac. COM1, COM2, COM3 windows
+    port_name = 'COM3';
+    if strcmp(computer,'MACI64')
+        port_name = '/dev/tty.usbserial';
+    end
+    lidar=serial(port_name,'baudrate',115200); % serial('/dev/tty.usbserial') for mac. COM1, COM2, COM3 windows
     set(lidar,'Timeout',0.1);   
     set(lidar,'InputBufferSize',40000);
     set(lidar,'Terminator','CR');
