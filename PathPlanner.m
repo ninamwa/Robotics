@@ -1,6 +1,7 @@
 function Waypoints = PathPlanner()
 %% Parameters
 robotRadius = 0.2; % was 0.2;
+resolution = 0.0500000007451; % m/cell
 NumNodes=1300; % gir smudere resultat kan tunes
 ConnectionDistance = 60; % høyere gir færre punkter % kan tunes
 WallMargin = 7;
@@ -41,19 +42,18 @@ end
 path = resultPath;
 
 %% Visualize
-pose = [path(1,1), path(1,2),0];
-Waypoints = [xx,yy];
-map2 = GetMap(robotRadius);
-viz.mapName = 'map2';
-viz(pose,path);
+%pose = [path(1,1), path(1,2),0];
+%Waypoints = [xx,yy];
+%map2 = GetMap(robotRadius);
+%viz.mapName = 'map2';
+%viz(pose,path);
 
-for i = 1:length(Waypoints(:,1))
-    theta = atan2(Waypoints(i,2),Waypoints(i,1))
-    pose = [Waypoints(i,1),Waypoints(i,2),theta*180/pi];
+%for i = 1:length(Waypoints(:,1))
+%    pose = [Waypoints(i,1),Waypoints(i,2),0];
     %ranges = lidar(pose);
     %viz(pose,Waypoints,ranges)
-    viz(pose,path);
-end
+%    viz(pose,path);
+%end
 %robo = InitController(map2,path,0.3,2,0.5)
-
+Waypoints = ([xx,yy]-[path(1,1),path(1,2)])*resolution ; % IS THIS CORRECT??
 end
