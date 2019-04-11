@@ -1,7 +1,9 @@
+
 function Waypoints = PathPlanner()
+
 %% Parameters
 robotRadius = 0.2; % was 0.2;
-%resolution = 0.0500000007451; % m/cell
+%resolution = 28.5*1000/430; % mm/cell
 NumNodes=1300; % gir smudere resultat kan tunes
 NumNodes= 1000; %1300; % gir smudere resultat kan tunes
 ConnectionDistance = 60; % høyere gir færre punkter % kan tunes
