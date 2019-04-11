@@ -1,7 +1,7 @@
 function Waypoints = PathPlanner()
 %% Parameters
 robotRadius = 0.2; % was 0.2;
-resolution = 0.0500000007451; % m/cell
+%resolution = 0.0500000007451; % m/cell
 NumNodes=1300; % gir smudere resultat kan tunes
 NumNodes= 1000; %1300; % gir smudere resultat kan tunes
 ConnectionDistance = 60; % høyere gir færre punkter % kan tunes
@@ -58,5 +58,6 @@ path = resultPath;
 %    viz(pose,path);
 %end
 %robo = InitController(map2,path,0.3,2,0.5)
-Waypoints = ([xx,yy]-[path(1,1),path(1,2)])*resolution ; % IS THIS CORRECT??
+Waypoints = ([xx,yy]-[path(1,1),path(1,2)])*(28.5/430)*1000; % multiply with 1000 to go from m to mm
+%disp(Waypoints)
 end
