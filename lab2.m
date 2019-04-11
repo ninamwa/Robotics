@@ -22,10 +22,12 @@ global door_detected;
 door_detected = false;
 
 reference_path=PathPlanner(); 
-for i = 1:length(reference_path(:,1))
+disp(length(reference_path(:,1)))
+for i = 1:100:length(reference_path(:,1))
     ref = reference_path(i,:);
     disp(odometry)
     disp(ref)
+    fprintf('error: %d\n', norm(odometry(1:2)-ref))
     while norm(odometry(1:2)-ref)>0.5
         if door_detected
             true_door = searchQR();
@@ -37,6 +39,7 @@ for i = 1:length(reference_path(:,1))
             door_detected=false;
         else 
             res = control_system(odometry,ref);
+            fprintf('v: %d, w: %d\n', res(1),res(2))
             pioneer_set_controls(sp,res(1),res(2));
         end
     end

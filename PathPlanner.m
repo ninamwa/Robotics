@@ -62,4 +62,5 @@ path = resultPath;
 %robo = InitController(map2,path,0.3,2,0.5)
 Waypoints = ([xx,yy]-[path(1,1),path(1,2)])*(28.5/430)*1000; % multiply with 1000 to go from m to mm
 %disp(Waypoints)
+
 end

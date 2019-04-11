@@ -45,6 +45,7 @@ end
 v = v_max*tanh(K1*e);
 w = v_max*((1+K2*phi)*tanh(K1*e)/e*sin(alpha)+K3*tanh(alpha));
 w = w - w_offset;
+w = round(w,3);
 res = [v,w];
 
 end
