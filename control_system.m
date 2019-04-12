@@ -1,16 +1,11 @@
 function res = control_system(odom,ref)
 
-% where the variable v represents the velocity of the coordinate frame O 
-% moving in a heading ? relative to the global frame G
-% The subscript r denotes the reference frame. 
-% That is, vr and ?r are reference velocity and reference heading angle of the coordinate frame R, respectively. 
-
 %tuned parameters
-K1 = 0.41;
-K2 = 2.94;
-K3 = 1.42;
+K1 = 0.05;
+K2 = 1;
+K3 = 0.05;
 v_max = 50; %maximum linear velocity
-w_offset =0; %0,051
+w_offset = 0.051;
 
 % Requirements: 
 % 2*k1*sqrt(k2) < k3 < k1(1+k2);
@@ -19,21 +14,31 @@ w_offset =0; %0,051
 
 x = odom(1);
 y=odom(2);
-theta=odom(3);
+theta = ((2*pi) / 4096) * odom(3);
+
+if theta>pi
+    theta = theta-2*pi;
+elseif theta < -pi
+    theta = theta + 2*pi;
+end
+
 x_r = ref(1);
 y_r = ref(2);
+if x_r
 theta_r = atan2(y_r,x_r);
 
+
 %Error state in polar representation
-e=(x-x_r)^2+(y-y_r)^2;
-phi = atan2(-(y-y_r),-(x-x_r))-theta_r;
+e=sqrt((x-x_r)^2+(y-y_r)^2);
+phi = atan2(y_r-y,x_r-x)-theta_r;
+
 if phi>pi
     phi = phi-2*pi;
 elseif phi < -pi
     phi = phi + 2*pi;
 end
         
-alpha = phi - theta+theta_r;
+alpha = phi - theta + theta_r;
         
 if alpha>pi
     alpha = alpha-2*pi;
@@ -41,11 +46,18 @@ elseif alpha < -pi
     alpha = alpha + 2*pi;
 end
 
+fprintf('e: %d, phi: %d, alpha: %d\n', e,phi,alpha)
+
+
 %control system
 v = v_max*tanh(K1*e);
-w = v_max*((1+K2*phi)*tanh(K1*e)/e*sin(alpha)+K3*tanh(alpha));
+v = round(v);
+
+w = v_max*((1+K2*phi/alpha)*(tanh(K1*e)/e)*sin(alpha)+K3*tanh(alpha));
 w = w - w_offset;
-w = round(w,3);
+w=w*180/pi;
+w=round(w);
+
 res = [v,w];
 
 end
