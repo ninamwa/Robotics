@@ -1,4 +1,8 @@
 function lab2()
+delete(timerfindall);
+sp = serial_port_start();
+pioneer_init(sp);
+
 
 lidartmr = timer('ExecutionMode', 'FixedRate', ...
     'Period', 1, ...
@@ -7,21 +11,29 @@ lidartmr = timer('ExecutionMode', 'FixedRate', ...
 
 
 odometrytmr = timer('ExecutionMode', 'FixedRate', ...
-    'Period', 1, ...
+    'Period', 0.1, ...
     'StartFcn',{@initOdometry}, ...
     'TimerFcn', {@odometrytimerCallback});
 
-start(lidartmr);
+%start(lidartmr);
 start(odometrytmr);
 global odometry;
 global door_detected;
 door_detected = false;
-cont = true;
-reference_path=PathPlanner(); 
-for i = 1:length(reference_path(:,1))
+
+%reference_path=PathPlanner(); 
+reference_path = dlmread('Path.txt');
+for i = 1:100:length(reference_path(:,1))
     ref = reference_path(i,:);
+    disp(odometry)
+    disp(ref)
+    fprintf('error: %d\n', norm(odometry(1:2)-ref))
     while norm(odometry(1:2)-ref)>0.5
-        if door_detected
+        if ~door_detected
+            res = control_system(odometry,ref);
+            fprintf('v: %d, w: %d\n', res(1),res(2))
+            pioneer_set_controls(sp,res(1),res(2));            
+        else 
             true_door = searchQR();
             if true_door
                 %Turn 90degrees
@@ -29,18 +41,15 @@ for i = 1:length(reference_path(:,1))
                 playSound(status);
             end
             door_detected=false;
-        else 
-            odom = pioneer_read_odometry();
-            [v,w] = control_system(odom,ref);
-            pioneer_set_controls(v,w);
-            %robot_control along trajectory from saved position
-            %end of path reached: cont = false;
         end
+        
     end
 end
 
 delete(lidartmr);
 delete(odometrytmr);
+pioneer_close(sp);
+serial_port_stop(sp);
 end
 
 function door_true = searchQR()
@@ -92,5 +101,5 @@ function lidartimerCallback(src, event)
 end
 function odometrytimerCallback(src, event)
     global odometry;
-    %odometry = pioneer_read_odometry();
+    odometry = pioneer_read_odometry();
 end
