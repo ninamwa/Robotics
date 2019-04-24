@@ -11,7 +11,7 @@ lidartmr = timer('ExecutionMode', 'FixedRate', ...
 
 
 odometrytmr = timer('ExecutionMode', 'FixedRate', ...
-    'Period', 1, ...
+    'Period', 0.1, ...
     'StartFcn',{@initOdometry}, ...
     'TimerFcn', {@odometrytimerCallback});
 
@@ -21,13 +21,43 @@ global odometry;
 global door_detected;
 door_detected = false;
 
-reference_path=PathPlanner(); 
-for i = 1:length(reference_path(:,1))
+figure(1);
+clf
+axis([-100,20000,-100,20000])
+hold on
+
+%reference_path=PathPlanner(); 
+reference_path = dlmread('Path.txt');
+x = reference_path(:,1);
+y = reference_path(:,2);
+
+
+radius=40;
+for k1 = 1:100:length(x)
+plot(x(k1),y(k1),'.');
+c = [x(k1) y(k1)];
+pos = [c-radius 2*radius 2*radius];
+rectangle('Position',pos,'Curvature',[1 1])
+axis equal
+end
+
+
+for i = 1:100:length(reference_path(:,1))
     ref = reference_path(i,:);
-    disp(odometry)
+    disp(odometry);
+    
     disp(ref)
-    while norm(odometry(1:2)-ref)>0.5
-        if door_detected
+    fprintf('error: %d\n', norm(odometry(1:2)-ref))
+    while norm(odometry(1:2)-ref)>40
+        hold on;
+        plot(odometry(1), odometry(2), 'k.');
+        drawnow;
+        hold off;
+        if ~door_detected
+            res = control_system(odometry,ref);
+            fprintf('v: %d, w: %d\n', res(1),res(2))
+            pioneer_set_controls(sp,res(1),res(2));            
+        else 
             true_door = searchQR();
             if true_door
                 %Turn 90degrees
@@ -35,11 +65,10 @@ for i = 1:length(reference_path(:,1))
                 playSound(status);
             end
             door_detected=false;
-        else 
-            res = control_system(odometry,ref);
-            pioneer_set_controls(sp,res(1),res(2));
         end
+        
     end
+    fprintf('POINT REACHED: %d', i)
 end
 
 delete(lidartmr);
