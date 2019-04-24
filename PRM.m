@@ -32,20 +32,20 @@ end
     xx=ppval(ppx, u);
     ppy = pchip(t,y);
     yy=ppval(ppy,u);
-    %plot(x,y,'o',xx,yy,'-','LineWidth',2);
+    plot(x,y,'o',xx,yy,'-','LineWidth',2);
 
 if length(totalpath)>1
     show(prm)
     hold on
     % make total path list, remove duplicates
     path = [totalpath;path];
-    endpoint = path(1,:);
+    endpoint = path(length(path),:);
     path = unique(path,'rows', 'stable');
-    path = [path;endpoint];
+    path = [path;endpoint]; %if to end in exact same as start
     
     i = 1;
     while true          
-       if sqrt((path(i,1)-path(i+1,1))^2) < 10 && sqrt((path(i,2)-path(i+1,2))^2) < 10
+       if sqrt((path(i,1)-path(i+1,1))^2) < 1 && sqrt((path(i,2)-path(i+1,2))^2) < 1
            if i == length(path)-1
                path(i,:) = [];
                break
@@ -57,7 +57,7 @@ if length(totalpath)>1
        else
            i = i+1;
        end
-       if (i == length(path)+1)
+       if (i == length(path)-1)
            break
        end
     end

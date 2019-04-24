@@ -10,7 +10,7 @@ function mapInflated = GetMap(robotRadius)
 image = imread('map2.png');
 image = image(55:500,50:480); % 572?×?524
 imageBW = image < 200;
-map = robotics.BinaryOccupancyGrid(imageBW,1);
+map = robotics.BinaryOccupancyGrid(imageBW,19.99999);
 
 %{
 show(map, "grid")

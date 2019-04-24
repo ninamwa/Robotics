@@ -10,7 +10,7 @@
 %
 function [rangescan]=LidarScan(lidar)
   
-MATLAB = 0;
+MATLAB = 1;
 
 proceed=0;
 while (proceed==0)
@@ -19,9 +19,9 @@ while (proceed==0)
         pause(0.01);
         data=fscanf(lidar);
     else
-        srl_write( lidar, "GD0044072500\r");
+        %srl_write( lidar, "GD0044072500\r");
         pause(0.01);
-        [data, nbytes] = srl_read( lidar, 10000);
+        %[data, nbytes] = srl_read( lidar, 10000);
     end
     if numel(data)==2134
         proceed=1;

@@ -3,7 +3,7 @@ function playSound(status)
         filename='applauce.wav';
     elseif strcmp(status, 'half')
         filename='applauce.wav';
-    else 
+    elseif strcmp(status, 'closed')
         filename='maybe-next-time.wav';
     end
     [y,Fs] = audioread(filename);
