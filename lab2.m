@@ -57,18 +57,44 @@ for i = 1:length(reference_path(:,1))
         plot(odometry(1), odometry(2), 'k.');
         drawnow;
         hold off;
-        if ~door_detected_right
-            res = control_system(odometry,ref,i);
+        if ~door_detected_right && ~door_detected_left
+            res = control_system(odometry,ref);
             fprintf('v: %d, w: %d\n', res(1),res(2))
-            pioneer_set_controls(sp,res(1),res(2));  
-        else 
-            true_door = searchQR();
-            if true_door
-                %Turn 90degrees
-                status = get_door_status();
+            pioneer_set_controls(sp,res(1),res(2));            
+        else
+            pioneer_set_controls(sp,50,0);
+            pause(8);
+            pioneer_set_controls(sp,0,0);
+            if door_detected_right
+                % Turn 90 degrees right
+                pioneer_set_controls(sp,0,-10);
+                pause(9)
+                pioneer_set_controls(sp,0,0);
+                % Get door status and Play sound
+                pause(1)
+                status = get_door_status(rangescan);
                 playSound(status);
+                % Turn 90degrees left
+                pioneer_set_controls(sp,0,10);
+                pause(9)
+                pioneer_set_controls(sp,0,0);
+                door_detected_right = false;
             end
-            door_detected_right=false;
+            if door_detected_left
+                % Turn 90degrees left
+                pioneer_set_controls(sp,0,10);
+                pause(9)
+                pioneer_set_controls(sp,0,0);
+                % Get door status and Play sound
+                pause(1)
+                status = get_door_status(rangescan);
+                playSound(status);
+                % Turn 90degrees right
+                pioneer_set_controls(sp,0,-10);
+                pause(9)
+                pioneer_set_controls(sp,0,0);
+                door_detected_left=false;
+            end
         end
         
     end
@@ -110,6 +136,8 @@ function lidartimerCallback(src, event)
     global odometry;
 
     rangescan = LidarScan(lidar);
+    [door_detected_left, door_detected_right] = lidarDoor(odometry,start_coordinates,rangescan)
+
       
         
     
