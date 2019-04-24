@@ -25,14 +25,16 @@ plot(q(1,1),q(1,2),'ro');
 q_obs2(1) = q_obs(1,3);
 
 k=1;
+
+
 for k1 = 1:100:length(x)
-plot(x(k1),y(k1),'bo');
+plot(x(k1),y(k1),'-r');
+hold on 
+text(x(k1),y(k1),num2str(k1),'Color','r')
 end
 
+
 for k1 = 1:100:length(x),
-    if(k1 == 20)
-        break
-    end
     q_ref = [x(k1),y(k1)];
     theta_r = atan2(q_ref(2),q_ref(1));
     
@@ -61,18 +63,17 @@ for k1 = 1:100:length(x),
         
         
         
-        K1 = 1;
+        K1 = 0.05;
         K2 = 1;
-        K3 = 1;
-        v_max=50;
+        K3 = 0.1;
+        v_max=100;
         
         %fprintf('e: %d, phi: %d, alpha: %d\n', e(k),phi(k),alpha(k))
         
         v(k) = v_max*tanh(K1*e(k));     
         w(k) = v_max*((1+K2*phi(k)/alpha(k))*(tanh(K1*e(k))/e(k))*sin(alpha(k))+K3*tanh(alpha(k)));
-        x = w(k)*180/pi;
-        x = round(x);
-        fprintf('v: %d, w: %d\n', v(k),x)
+        t = round(w(k)*180/pi);
+        fprintf('v: %d, w: %d\n', v(k),t)
         %pioneer_set_controls(sp,v(k),x);
         
         

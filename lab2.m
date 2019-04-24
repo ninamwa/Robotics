@@ -21,14 +21,38 @@ global odometry;
 global door_detected;
 door_detected = false;
 
+figure(1);
+clf
+axis([-100,20000,-100,20000])
+hold on
+
 %reference_path=PathPlanner(); 
 reference_path = dlmread('Path.txt');
+x = reference_path(:,1);
+y = reference_path(:,2);
+
+
+radius=40;
+for k1 = 1:100:length(x)
+plot(x(k1),y(k1),'.');
+c = [x(k1) y(k1)];
+pos = [c-radius 2*radius 2*radius];
+rectangle('Position',pos,'Curvature',[1 1])
+axis equal
+end
+
+
 for i = 1:100:length(reference_path(:,1))
     ref = reference_path(i,:);
-    disp(odometry)
+    disp(odometry);
+    
     disp(ref)
     fprintf('error: %d\n', norm(odometry(1:2)-ref))
-    while norm(odometry(1:2)-ref)>0.5
+    while norm(odometry(1:2)-ref)>40
+        hold on;
+        plot(odometry(1), odometry(2), 'k.');
+        drawnow;
+        hold off;
         if ~door_detected
             res = control_system(odometry,ref);
             fprintf('v: %d, w: %d\n', res(1),res(2))
@@ -44,6 +68,7 @@ for i = 1:100:length(reference_path(:,1))
         end
         
     end
+    fprintf('POINT REACHED: %d', i)
 end
 
 delete(lidartmr);
