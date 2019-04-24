@@ -18,8 +18,10 @@ odometrytmr = timer('ExecutionMode', 'FixedRate', ...
 %start(lidartmr);
 start(odometrytmr);
 global odometry;
-global door_detected;
-door_detected = false;
+global door_detected_right;
+global door_detected_left;
+door_detected_right = false;
+door_detected_left = false;
 
 figure(1);
 clf
@@ -27,23 +29,25 @@ axis([-100,20000,-100,20000])
 hold on
 
 %reference_path=PathPlanner(); 
-reference_path = dlmread('Path.txt');
+reference_path = dlmread('test.txt');
 x = reference_path(:,1);
 y = reference_path(:,2);
 
 
 radius=40;
-for k1 = 1:100:length(x)
+for k1 = 1:length(x)
 plot(x(k1),y(k1),'.');
 c = [x(k1) y(k1)];
 pos = [c-radius 2*radius 2*radius];
 rectangle('Position',pos,'Curvature',[1 1])
 axis equal
+text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
 end
 
 
-for i = 1:100:length(reference_path(:,1))
-    ref = reference_path(i,:);
+for i = 1:length(reference_path(:,1))
+    %ref = reference_path(i,:);
+    ref = reference_path(i,1:2);
     disp(odometry);
     
     disp(ref)
@@ -53,10 +57,10 @@ for i = 1:100:length(reference_path(:,1))
         plot(odometry(1), odometry(2), 'k.');
         drawnow;
         hold off;
-        if ~door_detected
-            res = control_system(odometry,ref);
+        if ~door_detected_right
+            res = control_system(odometry,ref,i);
             fprintf('v: %d, w: %d\n', res(1),res(2))
-            pioneer_set_controls(sp,res(1),res(2));            
+            pioneer_set_controls(sp,res(1),res(2));  
         else 
             true_door = searchQR();
             if true_door
@@ -64,7 +68,7 @@ for i = 1:100:length(reference_path(:,1))
                 status = get_door_status();
                 playSound(status);
             end
-            door_detected=false;
+            door_detected_right=false;
         end
         
     end
@@ -101,26 +105,12 @@ end
 %door threshold: office 7cm, bathroom 10cm
 function lidartimerCallback(src, event)
     global rangescan;
-    global door_detected;
+    global door_detected_left;
+    global door_detected_right;
     global odometry;
-    threshold = 60;
-    left = [];
-    right = [];
-    sum_left = [];
-    sum_right = [];
+
     rangescan = LidarScan(lidar);
-    left = [left,rangescan(85)]
-    right = [right,rangescan(597)]
-    sum_left = [left, left(end)-left(length(left)-1)]
-    sum_right = [right, right(end)-right(length(right)-1)]
-    
-    if(sum_left(end)>threshold)
-        door_detected = true
-    end
-    if(sum_right(end)>threshold)
-        door_detected = true
-    end
-   
+      
         
     
 end

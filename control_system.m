@@ -1,9 +1,16 @@
-function res = control_system(odom,ref)
+function res = control_system(odom,ref,nr)
 
 %tuned parameters
-K1 = 0.025;
-K2 = 0.5;
-K3 = 0.05;
+if nr > 70 
+    K1 = 0.025;
+    K2 = 0.2;
+    K3 = 0.05;
+else 
+    K1 = 0.025;
+    K2 = 0.5;
+    K3 = 0.05;
+end
+
 v_max = 50; %maximum linear velocity
 w_offset = 0.051;
 
