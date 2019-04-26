@@ -15,9 +15,12 @@ ranges = dlmread('closeddoor.txt');
 eliminate_x = 900; % only look at x=[-eliminate_x:eliminate_x]
 eliminate_y = 100; % only look at y>eliminate_y
 
-open_threshold = 1500;
-closed_threshold = 900;
-search_range_door = 199;
+open_threshold = 1500; % bigger than
+closed_threshold = 900; % less than
+closed_diff_threshold = 50; % threshold for difference between points in closed door
+search_range_door = 199; 
+% check x= [-search_range_door,0,search_range_door]
+%for thresholds
 
 
 %% Process ranges
@@ -43,10 +46,12 @@ for i =1:length(x)
     end
 end
 
-plot(points(:,1),points(:,2));
-hold on
 x=points(:,1);
 y=points(:,2);
+
+plot(x,y);
+hold on
+
 
 %% Find y values in before - middle - after
 for i=1:length(x)
@@ -78,12 +83,12 @@ end
 if before >open_threshold && middle >open_threshold && after >open_threshold
     status = 'open';
 elseif before <closed_threshold && middle <closed_threshold && after <closed_threshold
-    % check if closed or half open
-    if sqrt((before-after)^2)<50 && sqrt((middle-after)^2)<50 && sqrt((before-middle)^2)<50 % threshold for difference between points in closed door
+    % check if closed or half open by checking the differnence between points
+    if sqrt((before-after)^2)<closed_diff_threshold && sqrt((middle-after)^2)<closed_diff_threshold && sqrt((before-middle)^2)<closed_diff_threshold 
     status = 'closed';
     end
 else
-    status = 'halfopen';
+    status = 'half';
 end
 
 %'open'

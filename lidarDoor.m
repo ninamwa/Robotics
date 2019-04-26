@@ -30,11 +30,15 @@ for i = 1:length(x)
     end
 end
 
-%% Set thresholds
+%% Set thresholds and parameters
 door_threshold = 70; % How big norm represents a door?
 range_threshold = 1000; % How far is odomotry from a existing door?
-search_range = 1500; % How far ahead should we look for doors?
+search_range = 1000; % How far ahead should we look for doors?
 door_distance = 2; % How close should the robot be to the door before is it denoted as detected?
+detect_door_left = false;
+detect_door_right = false;
+L_index = 0;
+R_index = 0;
 
 %% Read doors:
 doors = dlmread('Doors_edit.txt'); % [x,y,bol] bol=1 right bol=0 left
@@ -42,6 +46,9 @@ doors = dlmread('Doors_edit.txt'); % [x,y,bol] bol=1 right bol=0 left
 %% Check if we are close to a door
 range =10000;
 found_doors = [];
+% For all doors in list, check if we are close enought, regarding odometry,
+% to start searching for the door
+% OBS! Odometry errors will make this a problem after a while... tune threshold
 for i = 1: length(doors(:,1))
     range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
     if range < range_threshold && doors(i,4)==0
@@ -49,59 +56,78 @@ for i = 1: length(doors(:,1))
     end
 end
 
-for i=1:length(found_doors(i,:))
-%% Find norms in right wall
-    if found_doors(i,3)==1 % Right door
-        right_door = [0,0]
-        for i = 1:length(rightpoints(:,1))
-            if rightpoints(i,2) < search_range
-                norm_right(i) = norm(rightpoints(i,:)-rightpoints(i+2,:));
-                % need to check where door and benches are in map
+% If any doors are in range of odometry
+if ~isempty(found_doors)
+    for i=1:length(found_doors(:,1))
+    %% Find norms in right wall
+        if found_doors(i,3)==1 % Right door
+            right_door = [0,0];
+            % Check rightpoints
+            for n = 1:length(rightpoints(:,1))
+                % In searchrange ( don't want to process more than .. m ahead )
+                if rightpoints(n,2) < search_range
+                    % Find all norms, benches and elevator could be detected
+                    norm_right(n) = norm(rightpoints(n,:)-rightpoints(n+2,:));
+                    % Find maxnorm on rightwall
+                    [Y,I] = max(norm_right);
+                    % If the norm is over a threshold, this would be a door
+                    if Y>door_threshold
+                        % Save start position of door
+                        right_door = [rightpoints(I,1),rightpoints(I,2)];
+                    end
+                    % If the distance to the door is less than door_distance, we
+                    % want a DOOR event to occur, and list the door as detected
+                    if norm(right_door(2))>0 && norm(right_door(2))<door_distance
+                        R_index = I; % used for plotting
+                        doors(found_doors(i,5),4)=1; % SET DOOR TO FOUND
+                        detect_door_right = true; % SET GLOBAL RIGHT DOOR TO TRUE
+                    end
+                end
             end
-            [Y,I] = max(norm_right);
-            if Y>door_threshold
-                right_door = [rightpoints(I,1),rightpoints(I,2)];
-            end
-            if norm(right_door(2))<2
-                doors(found_doors(i,5),4)=1; % SET DOOR TO FOUND
-                detect_door_right = true; % SET GLOBAL RIGHT DOOR TO TRUE
-            end
+        end
 
+        if found_doors(i,3)==0 %% If left door
+            %% Find norms on left wall
+            left_door = [0,0]
+            for n = 1:length(leftpoints(:,1))
+                if leftpoints(n,2) < search_range
+                    norm_left(n) = norm(leftpoints(n,:)-leftpoints(n+2,:));
+                    % max(diff_norm) > 70 - want index
+                    % need to check where door and benches are in map
+                
+                    [Y,I] = max(norm_left);
+                    if Y >door_threshold
+                        left_door = [leftpoints(I,1),leftpoints(I,2)];
+                    end
+                    if norm(left_door(2))>0 && norm(left_door(2))<door_distance
+                        L_index = I;
+                        doors(found_doors(i,5),4)=1; % SET DOOR TO FOUND
+                        detect_door_left = true; % SET GLOBAL LEFT DOOR TO TRUE
+                    end
+                    
+                end
+            end
         end
     end
-    
-    if found_doors(i,3)==0 %% If left door
-        %% Find norms on left wall
-        left_door = [0,0]
-        for i = 1:length(leftpoints(:,1))
-            if leftpoints(i,2) < search_range
-                norm_left(i) = norm(leftpoints(i,:)-leftpoints(i+2,:));
-                % max(diff_norm) > 70 - want index
-                % need to check where door and benches are in map
-            end
-            [Y,I] = max(norm_left);
-            if Y >door_threshold
-                left_door = [leftpoints(I,1),leftpoints(I,2)];
-            end
-            if norm(left_door(2))<2
-                doors(found_doors(i,5),4)=1; % SET DOOR TO FOUND
-                detect_door_left = true; % SET GLOBAL LEFT DOOR TO TRUE
-            end
-        end
-    end
+%% Write doors file with updated doors found
+%dlmwrite('Doors_edit.txt', doors,'newline','pc');
 end
 
-%% Write doors file with updated doors found
-dlmwrite('Doors_edit.txt', doors,'newline','pc');
-
+% Booleans that execute an event in cause of true
 ans = [detect_door_left, detect_door_right];
 
+% Plot rangescan and doors found
 plot(leftpoints(:,1),leftpoints(:,2))
 hold on
 plot(rightpoints(:,1),rightpoints(:,2))
 hold on
-plot(leftpoints(94,1),leftpoints(94,2),'o')
-hold on
-plot(rightpoints(112,1),rightpoints(112,2),'*')
+if L_index ~=0
+    plot(leftpoints(L_index,1),leftpoints(L_index,2),'o')
+    hold on
+end
+if R_index ~=0
+    plot(rightpoints(R_index,1),rightpoints(R_index,2),'*')
+end
+hold off
 
 end
