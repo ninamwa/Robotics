@@ -1,4 +1,4 @@
-function ans = lidarDoor(odom,start_coordinates)%,ranges) %input: ranges
+function ans = lidarDoor(odom,start_coordinates,ranges) %input: ranges
 % Odometry in mm
 % Start_coordinates in mm, worldcoordinates
 
@@ -49,7 +49,8 @@ nearby_door_right=[]; % Initialize list to prevent error
 nearby_door_left=[]; % Initialize list to prevent error
 
 %% Read doors:
-doors = dlmread('Doors_edit.txt'); % [x,y,bol] bol=1 right bol=0 left time consuming?
+%doors = dlmread('Doors_edit.txt'); % [x,y,bol] bol=1 right bol=0 left time consuming?
+doors = get_doors();
 
 %% Check if we are close to a door
 % For all doors in list, check if we are close enought, regarding odometry,
@@ -91,8 +92,9 @@ if ~isempty(nearby_door_right)% Right door
     % want a DOOR event to occur, and list the door as detected
     if norm(right_door(2))>0 && norm(right_door(2))<door_distance
         R_index = n; % used for plotting
-        doors(nearby_door_right(5),4)=1; % SET DOOR TO FOUND
+        %doors(nearby_door_right(5),4)=1; 
         detect_door_right = true; % SET GLOBAL RIGHT DOOR TO TRUE
+        set_door_detected(nearby_door_right(5))% SET DOOR TO FOUND
     end
 end
 
@@ -112,15 +114,17 @@ if ~isempty(nearby_door_left)%  If left door
     end
     if norm(left_door(2))>0 && norm(left_door(2))<door_distance
         L_index = n;
-        doors(nearby_door_left(5),4)=1; % SET DOOR TO FOUND
+        % doors(nearby_door_left(5),4)=1; SET DOOR TO FOUND
         detect_door_left = true; % SET GLOBAL LEFT DOOR TO TRUE
+        set_door_detected(nearby_door_left(5)); % SET DOOR TO FOUND
     end
 end
 
+% THIS IS REPLACED:
 %% Write doors file with updated doors found
-if detect_door_left || detect_door_right
+%if detect_door_left || detect_door_right
 %    dlmwrite('Doors_edit.txt', doors,'newline','pc');
-end
+%end
 
 
 % Booleans that execute an event in cause of true
