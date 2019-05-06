@@ -29,9 +29,9 @@ axis([-100,20000,-100,20000])
 hold on
 
 %reference_path=PathPlanner(); 
-reference_path = dlmread('test.txt');
-x = reference_path(:,1);
-y = reference_path(:,2);
+reference_path = dlmread('test4.txt');
+x = reference_path(:,1)*1000;
+y = reference_path(:,2)*1000;
 
 
 radius=40;
@@ -47,7 +47,7 @@ end
 
 for i = 1:length(reference_path(:,1))
     %ref = reference_path(i,:);
-    ref = reference_path(i,1:2);
+    ref = reference_path(i,1:2)*1000;
     disp(odometry);
     
     disp(ref)
@@ -58,7 +58,7 @@ for i = 1:length(reference_path(:,1))
         drawnow;
         hold off;
         if ~door_detected_right && ~door_detected_left
-            res = control_system(odometry,ref);
+            res = control_system(odometry,ref,i);
             fprintf('v: %d, w: %d\n', res(1),res(2))
             pioneer_set_controls(sp,res(1),res(2));            
         else

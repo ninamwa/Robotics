@@ -1,7 +1,11 @@
 function res = control_system(odom,ref,nr)
 
 %tuned parameters
-if nr > 70 
+if nr > 43 
+    K1 = 0.025;
+    K2 = 0.3; %Fungerte ikke med 0.3
+    K3 = 0.05;
+elseif nr > 74 
     K1 = 0.025;
     K2 = 0.2;
     K3 = 0.05;
@@ -65,6 +69,10 @@ v = round(v);
 
 w = v_max*((1+K2*phi/alpha)*(tanh(K1*e)/e)*sin(alpha)+K3*tanh(alpha));
 w = round((w - w_offset)*(180/pi))  ;
+
+if isnan(w)==1
+    w=0;
+end
 
 res = [v,w];
 
