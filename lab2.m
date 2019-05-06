@@ -20,8 +20,12 @@ start(odometrytmr);
 global odometry;
 global door_detected_right;
 global door_detected_left;
+global doors
 door_detected_right = false;
 door_detected_left = false;
+
+doors = dlmread('Doors_edit.txt'); % [x,y,bol,detected] bol=1 right, bol=0 left
+
 
 figure(1);
 clf
