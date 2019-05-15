@@ -34,7 +34,7 @@ global door_index;
 door_index = 1;
 
 global start_coordinates;
-%start_coordinates  =[2000,3000]; % from lab mm
+%start_coordinates  =[3600,2600]; % from lab mm
 start_coordinates = [6000,7125];% mm from hall
 
 global doors
@@ -115,7 +115,7 @@ for i = 1:length(reference_path(:,1))
             elseif i > 87 && i <= 101 && odometry(2) < ref(2)
                 break
             end
-           
+            
         end
         
     end
