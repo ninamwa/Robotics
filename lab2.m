@@ -33,12 +33,12 @@ axis([-100,20000,-100,20000])
 hold on
 
 %reference_path=PathPlanner(); 
-reference_path = dlmread('test4.txt');
+reference_path = dlmread('50p.txt');
 x = reference_path(:,1)*1000;
 y = reference_path(:,2)*1000;
 
 
-radius=40;
+radius=150;
 for k1 = 1:length(x)
 plot(x(k1),y(k1),'.');
 c = [x(k1) y(k1)];
@@ -50,20 +50,18 @@ end
 
 
 for i = 1:length(reference_path(:,1))
-    %ref = reference_path(i,:);
     ref = reference_path(i,1:2)*1000;
     disp(odometry);
     
     disp(ref)
     fprintf('error: %d\n', norm(odometry(1:2)-ref))
-    while norm(odometry(1:2)-ref)>40
+    while norm(odometry(1:2)-ref)>150
         hold on;
         plot(odometry(1), odometry(2), 'k.');
         drawnow;
         hold off;
         if ~door_detected_right && ~door_detected_left
             res = control_system(odometry,ref,i);
-            fprintf('v: %d, w: %d\n', res(1),res(2))
             pioneer_set_controls(sp,res(1),res(2));            
         else
             pioneer_set_controls(sp,50,0);

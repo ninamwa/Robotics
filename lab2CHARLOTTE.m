@@ -59,7 +59,7 @@ if h
     end
 end
 
-pioneer_set_controls(sp,100,0)
+pioneer_set_controls(sp,150,0)
 for i = 1:length(reference_path(:,1))
     %ref = reference_path(i,:);
     ref = reference_path(i,1:2)*1000;

@@ -23,10 +23,10 @@ points=[x,y];
 leftpoints = [];
 rightpoints = [];
 for i = 1:length(x)
-    if points(i,1)<0 && points(i,2)<2000 && rightorleft==1% ønsker ikke å kutte liste mer, for out of range problem i løkke
+    if points(i,1)<0 && points(i,2)<2000 % ønsker ikke å kutte liste mer, for out of range problem i løkke
         leftpoints= [points(i,:);leftpoints];
     end
-    if points(i,1)>0 && points(i,2)<2000 && rightorleft==0
+    if points(i,1)>0 && points(i,2)<2000
         rightpoints= [rightpoints;points(i,:)];
     end
 end
