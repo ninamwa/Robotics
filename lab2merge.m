@@ -65,7 +65,7 @@ for k1 = 1:length(x)
     text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
 end
 
-
+driveLab(sp,1);
 for i = 1:length(reference_path(:,1))
     ref = reference_path(i,1:2)*1000;
     disp(odometry);
@@ -121,7 +121,7 @@ for i = 1:length(reference_path(:,1))
     end
     fprintf('POINT REACHED: %d', i)
 end
-
+driveLab(sp,2);
 delete(lidartmr);
 delete(odometrytmr);
 pioneer_close(sp);
