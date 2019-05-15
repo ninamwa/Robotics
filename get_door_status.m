@@ -8,16 +8,16 @@ function status = get_door_status(ranges)
 %halfopendoor.txt
 %opendoor.txt
 %closeddoor.txt
-%ranges = dlmread('Testdoorstatus.txt');
-
+%ranges = dlmread('SCANDOORFOUND.txt');
+status= 'half';
 %% Define thresholds
 eliminate_x = 900; % only look at x=[-eliminate_x:eliminate_x]
 eliminate_y = 100; % only look at y>eliminate_y
 
 open_threshold = 2000; % bigger than
 closed_threshold = 1000; % less than
-closed_diff_threshold = 50; % threshold for difference between points in closed door
-search_range_door = 199; 
+closed_diff_threshold = 90; % threshold for difference between points in closed door
+search_range_door = 170;
 % check x= [-search_range_door,0,search_range_door]
 %for thresholds
 
@@ -32,7 +32,7 @@ for n = 1:length(ranges)
         x=[x; xn];
         y=[y; yn];
     end
-
+    
 end
 points=[];
 
@@ -62,7 +62,7 @@ for i=1:length(x)
     end
 end
 for i=1:length(x)
-    if x(i)<search_range_door 
+    if x(i)<search_range_door
         after=y(i);
         plot(x(i),after,'o');
         hold on
@@ -70,7 +70,7 @@ for i=1:length(x)
     end
 end
 for i=1:length(x)
-    if x(i)<0 
+    if x(i)<0
         middle=y(i);
         plot(x(i),middle,'*');
         hold off
@@ -89,8 +89,8 @@ if before >open_threshold && middle >open_threshold && after >open_threshold
     status = 'open';
 elseif before <closed_threshold && middle <closed_threshold && after <closed_threshold
     % check if closed or half open by checking the differnence between points
-    if sqrt((before-after)^2)<closed_diff_threshold && sqrt((middle-after)^2)<closed_diff_threshold && sqrt((before-middle)^2)<closed_diff_threshold 
-    status = 'closed';
+    if sqrt((before-after)^2)<closed_diff_threshold && sqrt((middle-after)^2)<closed_diff_threshold && sqrt((before-middle)^2)<closed_diff_threshold
+        status = 'closed';
     end
 else
     status = 'half';

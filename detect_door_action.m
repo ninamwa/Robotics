@@ -5,6 +5,7 @@ global door_detected_left
 global lidar
 global rangescan
 global door_index
+global sp
 pause_turning = 2;
 if LeftRightFront == 2
     pioneer_set_controls(sp,0,0);

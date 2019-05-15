@@ -68,7 +68,7 @@ end
 if ~isempty(nearby_door_right)% Right door
     right_door = [0,0];
     % Check rightpoints
-    for n = 1:length(rightpoints(:,1))
+    for n = 1:length(rightpoints(:,1))-2
         % In searchrange ( don't want to process more than .. m ahead )
         if rightpoints(n,2) < search_range
             % Find all norms, benches and elevator could be detected
@@ -96,7 +96,7 @@ end
 if ~isempty(nearby_door_left)%  If left door
     %% Find norms on left wall
     left_door = [0,0];
-    for n = 1:length(leftpoints(:,1))
+    for n = 1:length(leftpoints(:,1))-2
         if leftpoints(n,2) < search_range
             norm_left(n) = norm(leftpoints(n,:)-leftpoints(n+2,:));
               if norm_left(n) > door_threshold     % Find first maxnorm on rightwall
