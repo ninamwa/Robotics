@@ -1,4 +1,4 @@
-function lab2()
+function lab2CHARLOTTE()
 delete(timerfindall);
 sp = serial_port_start();
 pioneer_init(sp);
@@ -7,10 +7,10 @@ global rangescan;
 global odometry;
 
 
-lidartmr = timer('ExecutionMode', 'FixedRate', ...
-    'Period', 1, ...
-    'StartFcn',{@initLidar}, ...
-    'TimerFcn', {@lidartimerCallback});
+%lidartmr = timer('ExecutionMode', 'FixedRate', ...
+%   'Period', 1, ...
+%    'StartFcn',{@initLidar}, ...
+%   'TimerFcn', {@lidartimerCallback});
 
 
 odometrytmr = timer('ExecutionMode', 'FixedRate', ...
@@ -18,7 +18,7 @@ odometrytmr = timer('ExecutionMode', 'FixedRate', ...
     'StartFcn',{@initOdometry}, ...
     'TimerFcn', {@odometrytimerCallback});
 
-start(lidartmr);
+%start(lidartmr);
 start(odometrytmr);
 global door_detected_right;
 global door_detected_left;
