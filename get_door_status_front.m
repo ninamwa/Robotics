@@ -1,9 +1,9 @@
-function status = get_door_status_front(lidar,ranges)
+function status = get_door_status_front(ranges)%lidar,ranges)
 %% TODO: TUNE PARAMETERS
 
 %% TO TEST WITH LIDAR:
 %SetupLidar(); MATLAB MÅ VÆRE 1,  port_name ='/dev/tty.usbmodem1421';
-ranges=LidarScan(lidar);
+%ranges=LidarScan(lidar);
 
 %% TO TEST WITH RANGES FILES:
 %halfopendoor.txt
@@ -16,9 +16,9 @@ eliminate_x = 900; % only look at x=[-eliminate_x:eliminate_x]
 eliminate_y = 100; % only look at y>eliminate_y
 
 %% THESE NEED TO BE TUNED
-open_threshold = 2500; % bigger than
-closed_threshold = 2000; % less than
-closed_diff_threshold = 50; % threshold for difference between points in closed door
+open_threshold = 4000; % bigger than
+closed_threshold = 3000; % less than
+closed_diff_threshold = 80; % threshold for difference between points in closed door
 search_range_door = 199; 
 % check x= [-search_range_door,0,search_range_door]
 %for thresholds
