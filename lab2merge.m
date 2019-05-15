@@ -2,8 +2,10 @@ function lab2merge()
 delete(timerfindall);
 sp = serial_port_start();
 pioneer_init(sp);
+global lidar;
+SetupLidar();
 
-%{ 
+%{
 do not need lidar timer
 lidartmr = timer('ExecutionMode', 'FixedRate', ...
     'Period', 1, ...
@@ -20,8 +22,6 @@ odometrytmr = timer('ExecutionMode', 'FixedRate', ...
 start(odometrytmr);
 global rangescan;
 global odometry;
-global lidar
-
 global door_detected_right;
 global door_detected_left;
 global door_detected_front;
@@ -48,7 +48,7 @@ clf
 axis([-100,20000,-100,20000])
 hold on
 
-%reference_path=PathPlanner(); 
+%reference_path=PathPlanner();
 reference_path = dlmread('test8.txt');
 x = reference_path(:,1)*1000;
 y = reference_path(:,2)*1000;
@@ -56,12 +56,12 @@ y = reference_path(:,2)*1000;
 
 radius=150;
 for k1 = 1:length(x)
-plot(x(k1),y(k1),'.');
-c = [x(k1) y(k1)];
-pos = [c-radius 2*radius 2*radius];
-rectangle('Position',pos,'Curvature',[1 1])
-axis equal
-text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
+    plot(x(k1),y(k1),'.');
+    c = [x(k1) y(k1)];
+    pos = [c-radius 2*radius 2*radius];
+    rectangle('Position',pos,'Curvature',[1 1])
+    axis equal
+    text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
 end
 
 
@@ -75,66 +75,76 @@ for i = 1:length(reference_path(:,1))
         %% CHECK FOR NEARBY DOORS
         nearby_doors = doors_in_range(start_coordinates,odometry);
         if ~isempty(nearby_doors)
-                %nearby_doors
-                pioneer_set_controls(sp,0,0)
-                rangescan = LidarScan(lidar);
-                ans = lidarDoor(nearby_doors,rangescan);
-                door_detected_left = ans(1);
-                door_detected_right = ans(2);
-                door_detected_front = ans(3);
-        end 
+            %nearby_doors
+            rangescan = LidarScan(lidar);
+            angles_adjust = adjustment(rangescan);
+            ref = ref*cos(angles_adjust);
+            result = lidarDoor(nearby_doors,rangescan);
+            %door_detected_left = result(1);
+            %door_detected_right = result(2);
+            %door_detected_front = result(3);
+            door_detected_left = false;
+            door_detected_right = false;
+            door_detected_front = false;
+            disp(door_detected_right);
+            dlmwrite('SCANDOORFOUND.txt', rangescan,'newline','pc');
+        end
         hold on;
         plot(odometry(1), odometry(2), 'k.');
         drawnow;
         hold off;
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
             res = control_system(odometry,ref,i);
-            pioneer_set_controls(sp,res(1),res(2));            
-        elseif door_detected_front
-              pioneer_set_controls(sp,0,0);
-              status =  get_door_status_front(rangescan);
-              playSound(status);
-              door_detected_front = false;
-              door_index = door_index+1;
-        elseif door_detected_right || door_detected_left
-           pioneer_set_controls(sp,50,0);
-           pause(8);
-           pioneer_set_controls(sp,0,0);
-           door_index = door_index+1;
-           if door_detected_right
-                %Turn 90 degrees right
-               pioneer_set_controls(sp,0,-10);
-               pause(9)
-                rangescan = LidarScan(lidar);
-               pioneer_set_controls(sp,0,0);
-               % Get door status and Play sound
-                pause(1)
-               status = get_door_status(rangescan);
-                playSound(status);
-                % Turn 90degrees left
-               pioneer_set_controls(sp,0,10);
-               pause(9)
-                pioneer_set_controls(sp,0,0);
-               door_detected_right = false;
-            end
-            if door_detected_left
-               %Turn 90degrees left
-               pioneer_set_controls(sp,0,10);
-               pause(9)
-               rangescan = LidarScan(lidar);
-               pioneer_set_controls(sp,0,0);
-               % Get door status and Play sound
-                pause(1)
-                status = get_door_status(rangescan);
-                playSound(status);
-                % Turn 90degrees right
-                pioneer_set_controls(sp,0,-10);
-                pause(9)
-                pioneer_set_controls(sp,0,0);
-                door_detected_left=false;
-            end
+            pioneer_set_controls(sp,res(1),res(2));
+%         elseif door_detected_front
+%             pioneer_set_controls(sp,0,0);
+%             status =  get_door_status_front(rangescan);
+%             playSound(status);
+%             door_detected_front = false;
+%             door_index = door_index+1;
+%         elseif door_detected_right || door_detected_left
+%             pioneer_set_controls(sp,50,0);
+%             pause(8);
+%             pioneer_set_controls(sp,0,0);
+%             door_index = door_index+1;
+%             if door_detected_right
+%                 disp("rightdoor")
+%                 %Turn 90 degrees right
+%                 pioneer_set_controls(sp,0,-45);
+%                 pause(2)
+%                 pioneer_set_controls(sp,0,0);
+%                 pause(1)
+%                 % Get door status and Play sound
+%                 rangescan = LidarScan(lidar);
+%                 pause(1)
+%                 status = get_door_status(rangescan);
+%                 playSound(status);
+%                 pause(2)
+%                 % Turn 90degrees left
+%                 pioneer_set_controls(sp,0,45);
+%                 pause(2)
+%                 pioneer_set_controls(sp,0,0);
+%                 door_detected_right = false;
+%             end
+%             if door_detected_left
+%                 %Turn 90degrees left
+%                 pioneer_set_controls(sp,0,45);
+%                 pause(2)
+%                 pioneer_set_controls(sp,0,0);
+%                 % Get door status and Play sound
+%                 rangescan = LidarScan(lidar);
+%                 
+%                 pause(1)
+%                 status = get_door_status(rangescan);
+%                 playSound(status);
+%                 % Turn 90degrees right
+%                 pioneer_set_controls(sp,0,-45);
+%                 pause(2)
+%                 pioneer_set_controls(sp,0,0);
+%                 door_detected_left=false;
+%             end
         end
-           
+        
     end
     fprintf('POINT REACHED: %d', i)
 end
@@ -146,57 +156,57 @@ serial_port_stop(sp);
 end
 
 function door_true = searchQR()
-    message = test_qr_webcam();
-    if strcmp(message,DOOR)
-        door_true = true;
-    else
-        door_true = false;
-    end
+message = test_qr_webcam();
+if strcmp(message,DOOR)
+    door_true = true;
+else
+    door_true = false;
+end
 end
 
 function initLidar(src, event)
-    global rangescan;
-    rangescan = 0;
-    disp('lidar timer initialised')
+global rangescan;
+rangescan = 0;
+disp('lidar timer initialised')
 end
 
 function initOdometry(src, event)
-    global odometry;
-    odometry = 0;
-    disp('odometry timer initialised')
+global odometry;
+odometry = 0;
+disp('odometry timer initialised')
 end
 
 %door threshold: office 7cm, bathroom 10cm
 function lidartimerCallback(src, event)
-    global rangescan;
-    global door_detected_left;
-    global door_detected_right;
-    global odometry;
+global rangescan;
+global door_detected_left;
+global door_detected_right;
+global odometry;
 
-    rangescan = LidarScan(lidar);
-    [door_detected_left, door_detected_right] = lidarDoor(odometry,start_coordinates,rangescan)
+rangescan = LidarScan(lidar);
+[door_detected_left, door_detected_right] = lidarDoor(odometry,start_coordinates,rangescan)
 
-      
-        
-    
+
+
+
 end
 function odometrytimerCallback(src, event)
-    global odometry;
-    odometry = pioneer_read_odometry();
+global odometry;
+odometry = pioneer_read_odometry();
 end
 function nearby_doors = doors_in_range(start_coordinates,odom)
-    % For all doors in list, check if we are close enought, regarding odometry,
-    % to start searching for the door
-    % OBS! Odometry errors will make this a problem after a while... tune threshold
-    global door_index;
-    doors = get_doors();
-    odom_range_threshold = 1000; % How far is odomotry from a existing door?
-    nearby_doors=[]; % Initialize list to prevent error
-    i=door_index; % must be incremented
-        odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
-        %odom
-        %odom_range
-        if odom_range < odom_range_threshold && doors(i,4)==0 
-            nearby_doors=[nearby_doors;doors(i,:),i];
-        end
-end     
+% For all doors in list, check if we are close enought, regarding odometry,
+% to start searching for the door
+% OBS! Odometry errors will make this a problem after a while... tune threshold
+global door_index;
+doors = get_doors();
+odom_range_threshold = 1000; % How far is odomotry from a existing door?
+nearby_doors=[]; % Initialize list to prevent error
+i=door_index; % must be incremented
+odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
+%odom
+%odom_range
+if odom_range < odom_range_threshold && doors(i,4)==0
+    nearby_doors=[nearby_doors;doors(i,:),i];
+end
+end

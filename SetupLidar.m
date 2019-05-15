@@ -8,14 +8,14 @@
 % switch off the MATLAB variable if used in  Octave
 MATLAB = 1;
 
-
 if MATLAB
-    port_name = 'COM11';
+    port_name = 'COM12';
     if strcmp(computer,'MACI64')
         %port_name = '/dev/tty.usbserial';
 	    %port_name = '/dev/tty.usbserial';
 	    port_name ='/dev/cu.usbmodem1411';
     end
+   
     lidar=serial(port_name,'baudrate',115200); % serial('/dev/tty.usbserial') for mac. COM1, COM2, COM3 windows
     set(lidar,'Timeout',0.1);   
     set(lidar,'InputBufferSize',40000);

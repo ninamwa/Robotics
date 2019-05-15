@@ -11,7 +11,7 @@ StopPoints = [
             20.5,19.75;%20.5;
             18.6,21.5;
             8.2,21.5; %7.125
-            6.177,19.37; % 20.51
+            6.125,20.4; % 20.51
             6.177,7.125]; % 0.0633
     x=(StopPoints(:,1));
     y=(StopPoints(:,2));
@@ -28,7 +28,7 @@ StopPoints = [
     x= (xx-StopPoints(1,1))';
     y= (yy -StopPoints(1,2))';
     
-    Waypoints = [x,y]
+    Waypoints = [x,y];
 
 dlmwrite('PerfectPathHall.txt', Waypoints,'newline','pc');
 
@@ -67,11 +67,11 @@ StopPoints = [2,3
     x= (xx-StopPoints(1,1))';
     y= (yy -StopPoints(1,2))';
     
-    Waypoints = [x,y]
-d = dlmread('Doors_edit.txt')
+    Waypoints = [x,y];
+d = dlmread('Doors_edit.txt');
 plot(d(:,1)/1000,d(:,2)/1000,'o')
 
 hold off
 %       hold off
 
-dlmwrite('PerfectPathLab.txt', Waypoints,'newline','pc');
+%dlmwrite('PerfectPathLab.txt', Waypoints,'newline','pc');

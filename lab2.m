@@ -38,7 +38,7 @@ x = reference_path(:,1)*1000;
 y = reference_path(:,2)*1000;
 
 
-radius=150;
+radius=180;
 for k1 = 1:length(x)
 plot(x(k1),y(k1),'.');
 c = [x(k1) y(k1)];
@@ -55,7 +55,7 @@ for i = 1:length(reference_path(:,1))
     
     disp(ref)
     fprintf('error: %d\n', norm(odometry(1:2)-ref))
-    while norm(odometry(1:2)-ref)>150
+    while norm(odometry(1:2)-ref)>180
         hold on;
         plot(odometry(1), odometry(2), 'k.');
         drawnow;

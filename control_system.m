@@ -1,7 +1,7 @@
 function res = control_system(odom,ref,nr)
 
 %tuned parameters
-h = false;
+h = true;
 if h
     if nr > 43 
         K1 = 0.025;
@@ -18,15 +18,15 @@ if h
     end
 end
 
-K1 = 0.5;
-K2 = 2.3;
-K3 = 1.5;
-v_max=1.1;
+%K1 = 0.3;
+%K2 =1.7;
+%K3 = 1.1;
+%v_max=1;
 %K1 = 0.41;
 %K2 = 1.8;
 %K3 = 1.42;
 %v_max = 0.5; %maximum linear velocity
-%v_max=50;
+v_max=50;
 %w_offset = 0.051;
 
 w_offset = 0;
@@ -35,8 +35,8 @@ w_offset = 0;
 % k3 < Kmax;
 % k2 > 1;
 
-x = odom(1)/1000;
-y= odom(2)/1000;
+x = odom(1);
+y= odom(2);
 if odom(3)<= 2048
     theta = ((2*pi) / 4096) * odom(3);
 else 
@@ -50,8 +50,8 @@ elseif theta < -pi
     theta = theta + 2*pi;
 end
 
-x_r = ref(1)/1000;
-y_r = ref(2)/1000;
+x_r = ref(1);
+y_r = ref(2);
 theta_r = atan2(y_r,x_r);
 
 
@@ -75,7 +75,7 @@ end
 
 %control system
 v = v_max*tanh(K1*e);
-v = v*1000;
+%v = v*1000;
 v = round(v);
 
 w = v_max*((1+K2*phi/alpha)*(tanh(K1*e)/e)*sin(alpha)+K3*tanh(alpha));
