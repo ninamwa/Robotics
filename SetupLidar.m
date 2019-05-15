@@ -13,7 +13,8 @@ if MATLAB
     port_name = 'COM3';
     if strcmp(computer,'MACI64')
         %port_name = '/dev/tty.usbserial';
-        port_name ='/dev/cu.usbmodem1421';
+        port_name ='/dev/tty.usbmodem1411';
+        %port_name ='/dev/cu.usbserial';
     end
     lidar=serial(port_name,'baudrate',115200); % serial('/dev/tty.usbserial') for mac. COM1, COM2, COM3 windows
     set(lidar,'Timeout',0.1);   

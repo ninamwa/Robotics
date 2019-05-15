@@ -77,22 +77,28 @@ for i = 1:length(reference_path(:,1))
                 %nearby_doors
                 pioneer_set_controls(sp,0,0)
                 rangescan = LidarScan(lidar);
-                [door_detected_left, door_detected_right, door_detected_front] = lidarDoor(nearby_doors,rangescan);
-        if door_detected_right|| door_detected_left || door_detected_front
-            disp("door detected");
-            %pioneer_set_controls(sp,0,0);
-        end
+                ans = lidarDoor(nearby_doors,rangescan);
+                door_detected_left = ans(1);
+                door_detected_right = ans(2);
+                door_detected_front = ans(3);
+        %% ONLY FOR DEBUGGING
+                if door_detected_right|| door_detected_left || door_detected_front
+                    disp("door detected");
+                    %pioneer_set_controls(sp,0,0);
+                end
         
         end 
     %    if ~door_detected_right && ~door_detected_left && ~door_detected_front
      %       res = control_system(odometry,ref,i);
             %fprintf('v: %d, w: %d\n', res(1),res(2))
       %      pioneer_set_controls(sp,res(1),res(2)); 
-                %% If any doors are in range of odometry
+    
+      
+      %% If any doors are in range of odometry
 
        if door_detected_front
           pioneer_set_controls(sp,0,0);
-           status =  get_door_status_front(rangescan);
+          status =  get_door_status_front(rangescan);
           playSound(status);
           door_detected_front = false;
           door_index = door_index+1;
@@ -102,30 +108,32 @@ for i = 1:length(reference_path(:,1))
            pioneer_set_controls(sp,0,0);
            door_index = door_index+1;
            if door_detected_right
-                Turn 90 degrees right
+                %Turn 90 degrees right
                pioneer_set_controls(sp,0,-10);
                pause(9)
+                rangescan = LidarScan(lidar);
                pioneer_set_controls(sp,0,0);
                % Get door status and Play sound
                 pause(1)
                status = get_door_status(rangescan);
                 playSound(status);
-                Turn 90degrees left
+                % Turn 90degrees left
                pioneer_set_controls(sp,0,10);
                pause(9)
                 pioneer_set_controls(sp,0,0);
                door_detected_right = false;
             end
             if door_detected_left
-                Turn 90degrees left
+               %Turn 90degrees left
                pioneer_set_controls(sp,0,10);
                pause(9)
+               rangescan = LidarScan(lidar);
                pioneer_set_controls(sp,0,0);
-                Get door status and Play sound
+               % Get door status and Play sound
                 pause(1)
                 status = get_door_status(rangescan);
                 playSound(status);
-                Turn 90degrees right
+                % Turn 90degrees right
                 pioneer_set_controls(sp,0,-10);
                 pause(9)
                 pioneer_set_controls(sp,0,0);
@@ -181,8 +189,8 @@ function nearby_doors = doors_in_range(start_coordinates,odom)
     nearby_doors=[]; % Initialize list to prevent error
     i=door_index; % must be incremented
         odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
-        odom
-        odom_range
+        %odom
+        %odom_range
         if odom_range < odom_range_threshold && doors(i,4)==0 
             nearby_doors=[nearby_doors;doors(i,:),i];
         end
