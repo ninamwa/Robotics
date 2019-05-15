@@ -1,5 +1,6 @@
 function lab2merge()
 delete(timerfindall);
+global sp
 sp = serial_port_start();
 pioneer_init(sp);
 global lidar;
@@ -49,7 +50,7 @@ axis([-100,20000,-100,20000])
 hold on
 
 %reference_path=PathPlanner();
-reference_path = dlmread('test8.txt');
+reference_path = dlmread('test9.txt');
 x = reference_path(:,1)*1000;
 y = reference_path(:,2)*1000;
 
@@ -77,18 +78,17 @@ for i = 1:length(reference_path(:,1))
         if ~isempty(nearby_doors)
             %nearby_doors
             rangescan = LidarScan(lidar);
-            angles_adjust = adjustment(rangescan);
-            referance_path = referance_path(:,1)*cos(angles_adjust);
-            %reference_path = reference_path(:,1:2)*cos(angles_adjust);
+            %angles_adjust = adjustment(rangescan);
+            %ref = ref*cos(angles_adjust);
             result = lidarDoor(nearby_doors,rangescan);
-            %door_detected_left = result(1);
-            %door_detected_right = result(2);
-            %door_detected_front = result(3);
-            door_detected_left = false;
-            door_detected_right = false;
-            door_detected_front = false;
+            door_detected_left = result(1);
+            door_detected_right = result(2);
+            door_detected_front = result(3);
+            %door_detected_left = false;
+            %door_detected_right = false;
+            %door_detected_front = false;
             disp(door_detected_right);
-            dlmwrite('SCANDOORFOUND.txt', rangescan,'newline','pc');
+            %dlmwrite('SCANDOORFOUND.txt', rangescan,'newline','pc');
         end
         hold on;
         plot(odometry(1), odometry(2), 'k.');
