@@ -8,14 +8,14 @@ function status = get_door_status(ranges)
 %halfopendoor.txt
 %opendoor.txt
 %closeddoor.txt
-%ranges = dlmread('closeddoor.txt');
+%ranges = dlmread('Testdoorstatus.txt');
 
 %% Define thresholds
 eliminate_x = 900; % only look at x=[-eliminate_x:eliminate_x]
 eliminate_y = 100; % only look at y>eliminate_y
 
-open_threshold = 1500; % bigger than
-closed_threshold = 900; % less than
+open_threshold = 2000; % bigger than
+closed_threshold = 1000; % less than
 closed_diff_threshold = 50; % threshold for difference between points in closed door
 search_range_door = 199; 
 % check x= [-search_range_door,0,search_range_door]
@@ -82,6 +82,9 @@ end
 before
 middle
 after
+sqrt((before-after)^2)
+sqrt((middle-after)^2)
+sqrt((before-middle)^2)
 if before >open_threshold && middle >open_threshold && after >open_threshold
     status = 'open';
 elseif before <closed_threshold && middle <closed_threshold && after <closed_threshold

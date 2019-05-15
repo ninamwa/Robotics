@@ -17,7 +17,8 @@ read_buffer=[];
 
 if isempty(varargin)
     if strcmp(computer,'MACI64')
-        port_name = '/dev/tty.usbserial';
+        %port_name = '/dev/tty.usbserial';
+        port_name ='/dev/tty.usbmodem1411';
     else
         port_name = 'COM5';
     end
