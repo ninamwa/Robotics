@@ -78,7 +78,8 @@ for i = 1:length(reference_path(:,1))
             %nearby_doors
             rangescan = LidarScan(lidar);
             angles_adjust = adjustment(rangescan);
-            ref = ref*cos(angles_adjust);
+            referance_path = referance_path(:,1)*cos(angles_adjust);
+            %reference_path = reference_path(:,1:2)*cos(angles_adjust);
             result = lidarDoor(nearby_doors,rangescan);
             %door_detected_left = result(1);
             %door_detected_right = result(2);
