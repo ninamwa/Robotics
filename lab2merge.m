@@ -96,53 +96,12 @@ for i = 1:length(reference_path(:,1))
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
             res = control_system(odometry,ref,i);
             pioneer_set_controls(sp,res(1),res(2));
-%         elseif door_detected_front
-%             pioneer_set_controls(sp,0,0);
-%             status =  get_door_status_front(rangescan);
-%             playSound(status);
-%             door_detected_front = false;
-%             door_index = door_index+1;
-%         elseif door_detected_right || door_detected_left
-%             pioneer_set_controls(sp,50,0);
-%             pause(8);
-%             pioneer_set_controls(sp,0,0);
-%             door_index = door_index+1;
-%             if door_detected_right
-%                 disp("rightdoor")
-%                 %Turn 90 degrees right
-%                 pioneer_set_controls(sp,0,-45);
-%                 pause(2)
-%                 pioneer_set_controls(sp,0,0);
-%                 pause(1)
-%                 % Get door status and Play sound
-%                 rangescan = LidarScan(lidar);
-%                 pause(1)
-%                 status = get_door_status(rangescan);
-%                 playSound(status);
-%                 pause(2)
-%                 % Turn 90degrees left
-%                 pioneer_set_controls(sp,0,45);
-%                 pause(2)
-%                 pioneer_set_controls(sp,0,0);
-%                 door_detected_right = false;
-%             end
-%             if door_detected_left
-%                 %Turn 90degrees left
-%                 pioneer_set_controls(sp,0,45);
-%                 pause(2)
-%                 pioneer_set_controls(sp,0,0);
-%                 % Get door status and Play sound
-%                 rangescan = LidarScan(lidar);
-%                 
-%                 pause(1)
-%                 status = get_door_status(rangescan);
-%                 playSound(status);
-%                 % Turn 90degrees right
-%                 pioneer_set_controls(sp,0,-45);
-%                 pause(2)
-%                 pioneer_set_controls(sp,0,0);
-%                 door_detected_left=false;
-%             end
+        elseif door_detected_front
+            detect_door_action(2);%front
+        elseif door_detected_right
+            detect_door_action(1);%right
+        elseif door_detected_left
+            detect_door_action(0);%left
         end
         
     end
