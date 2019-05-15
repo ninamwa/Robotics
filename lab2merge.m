@@ -173,7 +173,7 @@ function nearby_doors = doors_in_range(start_coordinates,odom)
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 global door_index;
 doors = get_doors();
-odom_range_threshold = 1000; % How far is odomotry from a existing door?
+odom_range_threshold = 800; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error
 i=door_index; % must be incremented
 odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
