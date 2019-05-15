@@ -6,7 +6,7 @@ show(map);
 hold on 
 StopPoints = [
             6,7.125;
-            19,7.125; %19.5
+            20.2,7.225; %19.5
             20.5,9;%8.508;
             20.5,19.75;%20.5;
             18.6,21.5;
@@ -30,7 +30,7 @@ StopPoints = [
     
     Waypoints = [x,y];
 
-%dlmwrite('PerfectPathHall.txt', Waypoints,'newline','pc');
+dlmwrite('PerfectPathHall.txt', Waypoints,'newline','pc');
 
 StopPoints = [2,3
             4.5, 3

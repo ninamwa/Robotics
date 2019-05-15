@@ -1,5 +1,6 @@
 function lab2merge()
 delete(timerfindall);
+global sp
 sp = serial_port_start();
 pioneer_init(sp);
 global lidar;
@@ -49,7 +50,7 @@ axis([-100,20000,-100,20000])
 hold on
 
 %reference_path=PathPlanner();
-reference_path = dlmread('test8.txt');
+reference_path = dlmread('test9.txt');
 x = reference_path(:,1)*1000;
 y = reference_path(:,2)*1000;
 
@@ -64,7 +65,7 @@ for k1 = 1:length(x)
     text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
 end
 
-
+driveLab(sp,1);
 for i = 1:length(reference_path(:,1))
     ref = reference_path(i,1:2)*1000;
     disp(odometry);
@@ -77,18 +78,17 @@ for i = 1:length(reference_path(:,1))
         if ~isempty(nearby_doors)
             %nearby_doors
             rangescan = LidarScan(lidar);
-            angles_adjust = adjustment(rangescan);
-            referance_path = referance_path(:,1)*cos(angles_adjust);
-            %reference_path = reference_path(:,1:2)*cos(angles_adjust);
+            %angles_adjust = adjustment(rangescan);
+            %ref = ref*cos(angles_adjust);
             result = lidarDoor(nearby_doors,rangescan);
-            %door_detected_left = result(1);
-            %door_detected_right = result(2);
-            %door_detected_front = result(3);
-            door_detected_left = false;
-            door_detected_right = false;
-            door_detected_front = false;
+            door_detected_left = result(1);
+            door_detected_right = result(2);
+            door_detected_front = result(3);
+            %door_detected_left = false;
+            %door_detected_right = false;
+            %door_detected_front = false;
             disp(door_detected_right);
-            dlmwrite('SCANDOORFOUND.txt', rangescan,'newline','pc');
+            %dlmwrite('SCANDOORFOUND.txt', rangescan,'newline','pc');
         end
         hold on;
         plot(odometry(1), odometry(2), 'k.');
@@ -121,7 +121,7 @@ for i = 1:length(reference_path(:,1))
     end
     fprintf('POINT REACHED: %d', i)
 end
-
+driveLab(sp,2);
 delete(lidartmr);
 delete(odometrytmr);
 pioneer_close(sp);
@@ -173,7 +173,7 @@ function nearby_doors = doors_in_range(start_coordinates,odom)
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 global door_index;
 doors = get_doors();
-odom_range_threshold = 1000; % How far is odomotry from a existing door?
+odom_range_threshold = 800; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error
 i=door_index; % must be incremented
 odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
