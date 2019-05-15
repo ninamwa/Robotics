@@ -96,12 +96,25 @@ for i = 1:length(reference_path(:,1))
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
             res = control_system(odometry,ref,i);
             pioneer_set_controls(sp,res(1),res(2));
-        elseif door_detected_front
-            detect_door_action(2);%front
-        elseif door_detected_right
-            detect_door_action(1);%right
-        elseif door_detected_left
-            detect_door_action(0);%left
+        else
+            if door_detected_front
+                detect_door_action(2);%front
+            elseif door_detected_right
+                detect_door_action(1);%right
+            elseif door_detected_left
+                detect_door_action(0);%left
+            end
+            %% Check if we need to go to the next reference point. list numbers may be tuned
+            if i <= 29 && (odometry(1) > ref(1))
+                break
+            elseif i>29 && i <= 57 && odometry(2) > ref(2)
+                break
+            elseif i >57 && i <= 87 && odometry(1)  < ref(1)
+                break
+            elseif i > 87 && i <= 101 && odometry(2) < ref(2)
+                break
+            end
+           
         end
         
     end

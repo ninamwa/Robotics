@@ -13,7 +13,7 @@ if LeftRightFront == 2
     pause(1);
     status =  get_door_status_front(rangescan);
     playSound(status);
-    pause(2);
+    pause(3);
     door_detected_front = false;
     door_index = door_index+1;
 elseif LeftRightFront ==0 || LeftRightFront ==1
@@ -41,7 +41,7 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
     % Get door status and Play sound
     status = get_door_status(rangescan);
     playSound(status);
-    pause(2);
+    pause(3);
     % Turn 90degrees
     pioneer_set_controls(sp,0,second_turn);
     pause(pause_turning)
