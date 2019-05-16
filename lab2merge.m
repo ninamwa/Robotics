@@ -75,6 +75,7 @@ for i = 1:length(reference_path(:,1))
     while norm(odometry(1:2)-ref)>150
         %% CHECK FOR NEARBY DOORS
         nearby_doors = doors_in_range(start_coordinates,odometry);
+        angles_adjust = 0;
         if ~isempty(nearby_doors)
             %nearby_doors
             rangescan = LidarScan(lidar);
@@ -98,6 +99,12 @@ for i = 1:length(reference_path(:,1))
             res = control_system(odometry,ref,i);
             pioneer_set_controls(sp,res(1),res(2));
         else
+            angles_adjust = adjustment(rangescan);
+            if angles_adjust >0
+                reference_path(:,1:2) = reference_path(:,1:2)*(1+sind(angles_adjust));
+            else 
+                reference_path(:,1:2) = reference_path(:,1:2)*(1-sind(angles_adjust));
+            end
             if door_detected_front
                 detect_door_action(2);%front
             elseif door_detected_right
