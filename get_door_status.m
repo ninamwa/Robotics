@@ -1,4 +1,4 @@
-function status = get_door_status(ranges)
+function status = get_door_status()%ranges)
 
 %% TO TEST WITH LIDAR:
 %SetupLidar(); MATLAB MÅ VÆRE 1,  port_name ='/dev/tty.usbmodem1421';
@@ -8,7 +8,7 @@ function status = get_door_status(ranges)
 %halfopendoor.txt
 %opendoor.txt
 %closeddoor.txt
-%ranges = dlmread('closeddoor2.txt');
+ranges = dlmread('closeddoor2.txt');
 status= 'half';
 
 %% Process ranges
@@ -74,18 +74,22 @@ for i=1:length(x)
 end
 %}
 for i=1:length(x)
-    if x(i)<0
+    if x(i)<=0
         middle_index=i;
-        middle=y(i);
+        middle=y(middle_index);
+        if x(i)<0
+            middle_index=i-1;
+            middle=y(middle_index);
+        end
         plot(x(i),middle,'*');
         break
     end
 end
 
-after=y(middle_index +6);
-before = y(middle_index -6);
-plot(x(middle_index+6),after,'o');
-plot(x(middle_index-6),before,'o');
+after=y(middle_index -5);
+before = y(middle_index +5);
+plot(x(middle_index-5),after,'o');
+plot(x(middle_index+5),before,'o');
 hold off
 
 %% Check y values in before - middle - after
@@ -95,7 +99,7 @@ hold off
 %sqrt((before-after)^2)
 %sqrt((middle-after)^2)
 %sqrt((before-middle)^2)
-if before >open_threshold && middle >open_threshold && after >open_threshold
+if before > open_threshold && middle > open_threshold && after >open_threshold
     status = 'open';
 elseif before <closed_threshold && middle <closed_threshold && after <closed_threshold
     % check if closed or half open by checking the differnence between points
