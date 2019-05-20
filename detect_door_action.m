@@ -22,8 +22,6 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
     pioneer_set_controls(sp,50,0);
     pause(8);
     pioneer_set_controls(sp,0,0);
-    door_index = door_index+1;
-    
     if LeftRightFront == 1 %right
         first_turn = -45;
         second_turn = 45;
@@ -51,6 +49,7 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
     pioneer_set_controls(sp,0,second_turn);
     pause(pause_turning)
     pioneer_set_controls(sp,0,0);
+    door_index = door_index+1;
 end
     
 end
