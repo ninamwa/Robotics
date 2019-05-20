@@ -35,7 +35,7 @@ door_index = 1;
 
 global start_coordinates;
 %start_coordinates  =[3600,2600]; % from lab mm
-start_coordinates = [6000,7125];% mm from hall
+start_coordinates = [6200,7125];% mm from hall
 
 global doors
 %% TODO: Legg inn 6177,7000,2,0 nederst i doors_edit.txt hvis vi skal ha med front door.
@@ -50,7 +50,7 @@ axis([-100,20000,-100,20000])
 hold on
 
 %reference_path=PathPlanner();
-reference_path = dlmread('test9.txt');
+reference_path = dlmread('test11.txt');
 x = reference_path(:,1)*1000;
 y = reference_path(:,2)*1000;
 
@@ -65,7 +65,7 @@ for k1 = 1:length(x)
     text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
 end
 
-driveLab(sp,1);
+%driveLab(sp,1);
 for i = 1:length(reference_path(:,1))
     ref = reference_path(i,1:2)*1000;
     disp(odometry);
@@ -75,21 +75,14 @@ for i = 1:length(reference_path(:,1))
     while norm(odometry(1:2)-ref)>150
         %% CHECK FOR NEARBY DOORS
         nearby_doors = doors_in_range(start_coordinates,odometry);
-        angles_adjust = 0;
         if ~isempty(nearby_doors)
             %nearby_doors
             rangescan = LidarScan(lidar);
-            %angles_adjust = adjustment(rangescan);
-            %ref = ref*cos(angles_adjust);
             result = lidarDoor(nearby_doors,rangescan);
             door_detected_left = result(1);
             door_detected_right = result(2);
             door_detected_front = result(3);
-            %door_detected_left = false;
-            %door_detected_right = false;
-            %door_detected_front = false;
             disp(door_detected_right);
-            %dlmwrite('SCANDOORFOUND.txt', rangescan,'newline','pc');
         end
         hold on;
         plot(odometry(1), odometry(2), 'k.');
@@ -99,11 +92,16 @@ for i = 1:length(reference_path(:,1))
             res = control_system(odometry,ref,i);
             pioneer_set_controls(sp,res(1),res(2));
         else
+            angles_adjust = 0;
             angles_adjust = adjustment(rangescan);
+            disp("angles adjust:");
+            disp(angles_adjust);
             if angles_adjust >0
                 reference_path(:,1:2) = reference_path(:,1:2)*(1+sind(angles_adjust));
+                disp(reference_path);
             else 
                 reference_path(:,1:2) = reference_path(:,1:2)*(1-sind(angles_adjust));
+                disp(reference_path);
             end
             if door_detected_front
                 detect_door_action(2);%front
@@ -113,9 +111,9 @@ for i = 1:length(reference_path(:,1))
                 detect_door_action(0);%left
             end
             %% Check if we need to go to the next reference point. list numbers may be tuned
-            if i <= 29 && (odometry(1) > ref(1))
+            if i <= 15 && (odometry(1) > ref(1))
                 break
-            elseif i>29 && i <= 57 && odometry(2) > ref(2)
+            elseif i>15 && i <= 57 && odometry(2) > ref(2)
                 break
             elseif i >57 && i <= 87 && odometry(1)  < ref(1)
                 break
@@ -128,7 +126,7 @@ for i = 1:length(reference_path(:,1))
     end
     fprintf('POINT REACHED: %d', i)
 end
-driveLab(sp,2);
+%driveLab(sp,2);
 delete(lidartmr);
 delete(odometrytmr);
 pioneer_close(sp);
@@ -174,13 +172,15 @@ function odometrytimerCallback(src, event)
 global odometry;
 odometry = pioneer_read_odometry();
 end
+
+
 function nearby_doors = doors_in_range(start_coordinates,odom)
 % For all doors in list, check if we are close enought, regarding odometry,
 % to start searching for the door
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 global door_index;
 doors = get_doors();
-odom_range_threshold = 800; % How far is odomotry from a existing door?
+odom_range_threshold = 900; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error
 i=door_index; % must be incremented
 odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);

@@ -1,4 +1,4 @@
-function status = get_door_status()%ranges)
+function status = get_door_status(ranges)
 
 %% TO TEST WITH LIDAR:
 %SetupLidar(); MATLAB MÅ VÆRE 1,  port_name ='/dev/tty.usbmodem1421';
@@ -8,7 +8,7 @@ function status = get_door_status()%ranges)
 %halfopendoor.txt
 %opendoor.txt
 %closeddoor.txt
-ranges = dlmread('closeddoor2.txt');
+%ranges = dlmread('closeddoor2.txt');
 status= 'half';
 
 %% Process ranges
