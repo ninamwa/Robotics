@@ -26,8 +26,8 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
         first_turn = -45;
         second_turn = 45;
         door_detected_right = false;
-        if door_index == 3
-            second_turn =90; % 180 degrees, dette må nok gjøres for dør i hjørne 3 og :)
+        if door_index == 3 || door_index==14
+            second_turn =90; % 180 degrees, for doors in corner 1 and 3
         end
     elseif LeftRightFront ==0 %left
         first_turn = 45;
