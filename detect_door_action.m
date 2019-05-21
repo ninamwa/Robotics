@@ -50,6 +50,26 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
     pause(pause_turning)
     pioneer_set_controls(sp,0,0);
     door_index = door_index+1;
-end
     
+    if door_index == 6
+        first_turn = 45;
+        second_turn = -45;
+        door_detected_left = false;
+        pioneer_set_controls(sp,0,first_turn);
+        pause(pause_turning)
+        pioneer_set_controls(sp,0,0);
+        pause(1)
+        rangescan = LidarScan(lidar);
+        pause(1)
+        % Get door status and Play sound
+        status = get_door_status(rangescan);
+        playSound(status);
+        pause(3);
+        % Turn 90degrees
+        pioneer_set_controls(sp,0,second_turn);
+        pause(pause_turning)
+        pioneer_set_controls(sp,0,0);
+        door_index = door_index+1;
+    end
+end
 end

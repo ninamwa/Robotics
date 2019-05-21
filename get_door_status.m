@@ -8,7 +8,7 @@ function status = get_door_status(ranges)
 %halfopendoor.txt
 %opendoor.txt
 %closeddoor.txt
-%ranges = dlmread('closeddoor2.txt');
+%ranges = dlmread('halfopendoor2.txt');
 status= 'half';
 
 %% Process ranges
@@ -81,7 +81,7 @@ for i=1:length(x)
             middle_index=i-1;
             middle=y(middle_index);
         end
-        plot(x(i),middle,'*');
+        plot(x(middle_index),middle,'*');
         break
     end
 end
@@ -99,7 +99,7 @@ hold off
 %sqrt((before-after)^2)
 %sqrt((middle-after)^2)
 %sqrt((before-middle)^2)
-if before > open_threshold && middle > open_threshold && after >open_threshold
+if  middle > open_threshold && after >open_threshold % before > open_threshold &&
     status = 'open';
 elseif before <closed_threshold && middle <closed_threshold && after <closed_threshold
     % check if closed or half open by checking the differnence between points

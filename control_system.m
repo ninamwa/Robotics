@@ -1,4 +1,4 @@
-function res = control_system(odom,ref,nr)
+function res = control_system(odom,theta_adjust,distance_to_door,ref,nr)
 
 %tuned parameters
 h = true;
@@ -34,14 +34,33 @@ w_offset = 0;
 % 2*k1*sqrt(k2) < k3 < k1(1+k2);
 % k3 < Kmax;
 % k2 > 1;
-
-x = odom(1);
+correction = 0 ;
+if distance_to_door ~= 0 
+    correction = distance_to_door - 835; %mm, half hall
+end
+if nr <= 15
+    x = odom(1);
+    y = odom(2)+correction;
+elseif nr <= 57
+    x = odom(1)+ correction;
+    y = odom(2);
+elseif nr <= 87 
+    x = odom(1) ;
+    y = odom(2)- correction;
+elseif nr <= 101 
+    x = odom(1) - correction;
+    y = odom(2);
+x = odom(1) 
 y= odom(2);
 if odom(3)<= 2048
     theta = ((2*pi) / 4096) * odom(3);
 else 
     theta = (((2*pi) / 4096) * odom(3))-(2*pi);
 end
+
+%disp(theta)
+%theta = theta - theta_adjust; 
+%disp(theta)
 
 
 if theta>pi

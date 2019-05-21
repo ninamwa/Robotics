@@ -7,6 +7,7 @@ function ans = lidarDoor(nearby_doors,ranges)  %input: ranges
 %dør start.
 x= [];
 y=[];
+distance_to_door = 0;
 lidar_error_range = 15; % can be tuned
 for n = 1:length(ranges)
     if ranges(n)> lidar_error_range
@@ -79,6 +80,7 @@ if ~isempty(nearby_door_right)% Right door
                 Y = norm_right(n);
                 % Save start position of door
                 right_door = [rightpoints(n,1),rightpoints(n,2)];
+                distance_to_door = rightpoints(n,1);
                 break
             end
         end
@@ -103,6 +105,7 @@ if ~isempty(nearby_door_left)%  If left door
                 Y= norm_left(n);
                 % Save start position of door
                 left_door = [leftpoints(n,1),leftpoints(n,2)];
+                distance_to_door = 835 - leftpoints(n,1);
                 break
               end
         end
@@ -144,7 +147,7 @@ end
 
 
 % Booleans that execute an event in cause of true
-ans = [detect_door_left, detect_door_right, detect_door_front];
+ans = [detect_door_left, detect_door_right, detect_door_front, distance_to_door];
 
 % Plot rangescan and doors found
 %{

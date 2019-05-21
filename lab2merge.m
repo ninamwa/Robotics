@@ -29,9 +29,13 @@ global door_detected_front;
 door_detected_right = false;
 door_detected_left = false;
 door_detected_front = false;
+global distance_to_door;
+distance_to_door = 0;
 
 global door_index;
 door_index = 1;
+global theta_adjust;
+theta_adjust = 0;
 
 global start_coordinates;
 %start_coordinates  =[3600,2600]; % from lab mm
@@ -82,6 +86,7 @@ for i = 1:length(reference_path(:,1))
             door_detected_left = result(1);
             door_detected_right = result(2);
             door_detected_front = result(3);
+            distance_to_door = result(4);
             disp(door_detected_right);
         end
         hold on;
@@ -89,24 +94,18 @@ for i = 1:length(reference_path(:,1))
         drawnow;
         hold off;
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
-            res = control_system(odometry,ref,i);
+            res = control_system(odometry,theta_adjust,distance_to_door,ref,i);
             pioneer_set_controls(sp,res(1),res(2));
         else
-            angles_adjust = 0;
-            angles_adjust = adjustment(rangescan);
-            disp("angles adjust:");
-            disp(angles_adjust);
-            if angles_adjust ~=0 && i<=15
-                reference_path(i:15,2) = reference_path(i:15,2) + (reference_path(i:15,1)-odometry(1))*sind(angles_adjust);
-                disp(reference_path);
-            elseif angles_adjust ~=0 && i>15 && i<=57
-                reference_path(i:57,1) = reference_path(:,1) + (reference_path(:,2)-odometry(2))*sind(angles_adjust);
-            end
+            %angles_adjust = 0;
+            theta_adjust = adjustment(rangescan);
+            theta_adjust
+           
             if door_detected_front
                 detect_door_action(2);%front
             elseif door_detected_right
                 detect_door_action(1);%right
-            elseif door_detected_left
+            elseif door_detected_left 
                 detect_door_action(0);%left
             end
             %% Check if we need to go to the next reference point. list numbers may be tuned
@@ -172,14 +171,13 @@ global odometry;
 odometry = pioneer_read_odometry();
 end
 
-
 function nearby_doors = doors_in_range(start_coordinates,odom)
 % For all doors in list, check if we are close enought, regarding odometry,
 % to start searching for the door
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 global door_index;
 doors = get_doors();
-odom_range_threshold = 800; % How far is odomotry from a existing door?
+odom_range_threshold = 900; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error
 i=door_index; % must be incremented
 odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
