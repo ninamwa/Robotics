@@ -34,8 +34,6 @@ distance_to_door = 0;
 
 global door_index;
 door_index = 1;
-global theta_adjust;
-theta_adjust = 0;
 
 global start_coordinates;
 %start_coordinates  =[3600,2600]; % from lab mm
@@ -44,7 +42,6 @@ start_coordinates = [6000,7125];% mm from hall
 global doors
 %% TODO: Legg inn 6177,7000,2,0 nederst i doors_edit.txt hvis vi skal ha med front door.
 
-global nearby_doors;
 doors = dlmread('Doors_edit.txt'); % [x,y,bol,detected] bol=1 right, bol=0 left, bol=2 front
 
 
@@ -93,11 +90,11 @@ for i = 1:length(reference_path(:,1))
         %drawnow;
         %hold off;
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
-            res = control_system(odometry,theta_adjust,distance_to_door,ref,i);
+            %disp(odometry)
+            res = control_system(odometry,distance_to_door,ref,i);
             pioneer_set_controls(sp,res(1),res(2));
-        else
-            %angles_adjust = 0;
-            %theta_adjust = adjustment(rangescan);          
+            %disp(res)
+        else         
             if door_detected_front
                 detect_door_action(2);%front
             elseif door_detected_right
@@ -126,26 +123,11 @@ for i = 1:length(reference_path(:,1))
     fprintf('POINT REACHED: %d', i)
 end
 %driveLab(sp,2);
-delete(lidartmr);
 delete(odometrytmr);
 pioneer_close(sp);
 serial_port_stop(sp);
 end
 
-function door_true = searchQR()
-message = test_qr_webcam();
-if strcmp(message,DOOR)
-    door_true = true;
-else
-    door_true = false;
-end
-end
-
-function initLidar(src, event)
-global rangescan;
-rangescan = 0;
-disp('lidar timer initialised')
-end
 
 function initOdometry(src, event)
 global odometry;
@@ -153,20 +135,7 @@ odometry = 0;
 disp('odometry timer initialised')
 end
 
-%door threshold: office 7cm, bathroom 10cm
-function lidartimerCallback(src, event)
-global rangescan;
-global door_detected_left;
-global door_detected_right;
-global odometry;
 
-rangescan = LidarScan(lidar);
-[door_detected_left, door_detected_right] = lidarDoor(odometry,start_coordinates,rangescan)
-
-
-
-
-end
 function odometrytimerCallback(src, event)
 global odometry;
 odometry = pioneer_read_odometry();

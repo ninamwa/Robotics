@@ -51,6 +51,7 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
     pause(pause_turning)
     pioneer_set_controls(sp,0,0);
     door_index = door_index+1;
+    pioneer_set_controls(sp,50,0);
     
     if door_index == 6
         first_turn = 45;

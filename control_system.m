@@ -1,4 +1,4 @@
-function res = control_system(odom,theta_adjust,distance_to_door,ref,nr)
+function res = control_system(odom,distance_to_door,ref,nr)
 %tuned parameters
 h = true;
 if h
@@ -40,7 +40,7 @@ end
 if nr <= 15
     x = odom(1);
     y = odom(2)+correction;
-elseif nr <= 57
+elseif nr <= 57 
     x = odom(1)+ correction;
     y = odom(2);
 elseif nr <= 87 
@@ -51,7 +51,7 @@ elseif nr <= 101
     y = odom(2);
 end
 %x = odom(1) 
-%y= odom(2);
+%y = odom(2);
 if odom(3)<= 2048
     theta = ((2*pi) / 4096) * odom(3);
 else 
@@ -99,7 +99,9 @@ v = round(v);
 
 w = v_max*((1+K2*phi/alpha)*(tanh(K1*e)/e)*sin(alpha)+K3*tanh(alpha));
 w = round((w - w_offset)*(180/pi))  ;
-
+w
+phi
+alpha
 
 if isnan(w)
     w=0;
