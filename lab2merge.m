@@ -2,7 +2,8 @@ function lab2merge()
 delete(timerfindall);
 sp = serial_port_start();
 pioneer_init(sp);
-lidar = SetupLidar();
+global lidar;
+SetupLidar();
 
 %{
 do not need lidar timer
@@ -24,10 +25,11 @@ global odometry;
 door_detected_right = false;
 door_detected_left = false;
 door_detected_front = false;
-distance_to_door = 0;
+distance_to_wall = 0;
 global door_index;
 door_index = 1;
-%% TODO: Legg inn 6177,7000,2,0 nederst i doors_edit.txt hvis vi skal ha med front door.
+
+%TODO: Legg inn 6177,7000,2,0 nederst i doors_edit.txt hvis vi skal ha med front door.
 
 doors = dlmread('Doors_edit.txt'); % [x,y,bol,detected] bol=1 right, bol=0 left, bol=2 front
 
@@ -53,17 +55,18 @@ for k1 = 1:length(x)
     text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
 end
 
+x_real=0;
+y_real=0;
 %driveLab(sp,1);
 for i = 1:length(reference_path(:,1))
     ref = reference_path(i,1:2)*1000;
     fprintf("odom %d: ",odometry);
     fprintf("ref %d: ",ref);
     fprintf('error: %d\n', norm(odometry(1:2)-ref))
-    while norm(odometry(1:2)-ref)>150
-        %% CHECK FOR NEARBY DOORS
-        nearby_doors = doors_in_range(doors,odometry);
+    
+    while norm([x_real,y_real]-ref)>150
+        nearby_doors = doors_in_range(doors,[x_real,y_real]);
         if ~isempty(nearby_doors)
-            %nearby_doors
             rangescan = LidarScan(lidar);
             LD_result = lidarDoor(nearby_doors,rangescan);
             door_detected_left = LD_result(1);
@@ -76,15 +79,10 @@ for i = 1:length(reference_path(:,1))
         %drawnow;
         %hold off;
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
-            %disp(odometry)
-            res = control_system(odometry,distance_to_door,ref,i);
-            %if abs(res(2)) > 50
-            %    res(1)=0;
-            %    res(2)=0;
-            %    stop()
-            %end 
+            res = control_system(odometry,ref,distance_to_wall,i);
+            x_real=res(3);
+            y_real=res(4);
             pioneer_set_controls(sp,res(1),res(2));
-            %disp(res)
         else         
             if door_detected_front
                 detect_door_action(sp,2,lidar);%front
@@ -92,15 +90,15 @@ for i = 1:length(reference_path(:,1))
             elseif door_detected_right
                 detect_door_action(sp,1,lidar);%right
                 door_detected_right = false;
-                distance_to_door = LD_result(4);
-                fprintf("correction %d :",distance_to_door - 835);       
+                distance_to_wall = LD_result(4);
+                fprintf("correction %d :",distance_to_wall - 835);       
             elseif door_detected_left 
                  detect_door_action(sp,0,lidar);%left
                  door_detected_left = false;
-                 distance_to_door = result(4);
+                 distance_to_wall = result(4);
 
             end
-            %% Check if we need to go to the next reference point. list numbers may be tuned
+            % Check if we need to go to the next reference point. list numbers may be tuned
             if i <= 15 && (odometry(1) > ref(1))
                 break
             elseif i>15 && i <= 57 && odometry(2) > ref(2)

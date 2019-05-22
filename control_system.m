@@ -1,4 +1,4 @@
-function res = control_system(odom,distance_to_door,ref,nr)
+function res = control_system(odom,ref,distance_to_wall,nr)
 %tuned parameters
 h = true;
 if h
@@ -29,13 +29,10 @@ v_max=50;
 %w_offset = 0.051;
 
 w_offset = 0;
-% Requirements: 
-% 2*k1*sqrt(k2) < k3 < k1(1+k2);
-% k3 < Kmax;
-% k2 > 1;
-correction = 0 ;
-if distance_to_door ~= 0 
-    correction = distance_to_door - 835; %mm, half hall
+
+correction=0;
+if distance_to_wall ~= 0 
+  correction = distance_to_wall - 835; %mm, half hall
 end
 if nr <= 15
     x = odom(1);
@@ -50,18 +47,11 @@ elseif nr <= 101
     x = odom(1) - correction;
     y = odom(2);
 end
-%x = odom(1) 
-%y = odom(2);
 if odom(3)<= 2048
     theta = ((2*pi) / 4096) * odom(3);
 else 
     theta = (((2*pi) / 4096) * odom(3))-(2*pi);
 end
-
-%disp(theta)
-%theta = theta - theta_adjust; 
-%disp(theta)
-
 
 if theta>pi
     theta = theta-2*pi;
@@ -115,6 +105,6 @@ elseif isnan(v)
     v=0;
 end
 
-res = [v,w];
+res = [v,w,x,y];
 
 end
