@@ -38,7 +38,7 @@ end
 %% Set thresholds and parameters
 door_threshold = 70; %60? think 70 is too big. How big norm represents a door?
 search_range = 1500; % 1000? How far ahead should we look for doors?
-door_distance = 70; %2 is probably to small. How close should the robot be to the door before is it denoted as detected?
+door_distance = 100; %2 is probably to small. How close should the robot be to the door before is it denoted as detected?
 door_distance_front = 1700;
 detect_door_left = false; % results
 detect_door_right = false; % results
@@ -147,7 +147,7 @@ end
 ans = [detect_door_left, detect_door_right, detect_door_front, distance_to_door];
 
 % Plot rangescan and doors found
-
+%{
 figure(2)
 plot(leftpoints(:,1),leftpoints(:,2))
 hold on
@@ -157,5 +157,5 @@ if R_index ~=0
     plot(rightpoints(R_index,1),rightpoints(R_index,2),'*')
 end
 hold off
-
+%}
 end
