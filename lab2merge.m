@@ -92,6 +92,11 @@ for i = 1:length(reference_path(:,1))
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
             %disp(odometry)
             res = control_system(odometry,distance_to_door,ref,i);
+            %if abs(res(2)) > 50
+            %    res(1)=0;
+            %    res(2)=0;
+            %    stop()
+            %end 
             pioneer_set_controls(sp,res(1),res(2));
             %disp(res)
         else         
@@ -145,6 +150,7 @@ function nearby_doors = doors_in_range(start_coordinates,odom)
 % For all doors in list, check if we are close enought, regarding odometry,
 % to start searching for the door
 % OBS! Odometry errors will make this a problem after a while... tune threshold
+disp(odom)
 global door_index;
 doors = get_doors();
 odom_range_threshold = 1000; % How far is odomotry from a existing door?
