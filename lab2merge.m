@@ -42,10 +42,15 @@ hold on
 
 %reference_path=PathPlanner();
 reference_path = dlmread('test11.txt');
-x = reference_path(:,1)*1000;
-y = reference_path(:,2)*1000;
 
+driveLab(sp,1);
+x_real=odometry(1);
+y_real=odometry(2);
+reference_path(:,1)=reference_path(:,1)*1000+odometry(1);
+reference_path(:,2)=reference_path(:,2)*1000+odometry(2);
 
+x = reference_path(:,1);
+y = reference_path(:,2);
 radius=150;
 for k1 = 1:length(x)
     plot(x(k1),y(k1),'.');
@@ -56,26 +61,13 @@ for k1 = 1:length(x)
     text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
 end
 
-x_real=0;
-y_real=0;
-%driveLab(sp,1);
-for i = 1:length(reference_path(:,1))
-    ref = reference_path(i,1:2)*1000;
+for i=1:length(reference_path(:,1))
+    ref = reference_path(i,1:2);
     disp(odometry)
     disp(ref)
     disp(norm(odometry(1:2)-ref))
     
     while norm([x_real,y_real]-ref)>150
-     % Check if we need to go to the next reference point. list numbers may be tuned
-        if i <= 14 && (x_real > ref(1))
-            break
-        elseif i>14 && i <= 57 && y_real > ref(2)
-            break
-        elseif i >57 && i <= 87 && x_real  < ref(1)
-            break
-        elseif i > 87 && i <= 101 && y_real < ref(2)
-            break
-        end
         nearby_doors = doors_in_range(doors,[x_real,y_real]);
         if ~isempty(nearby_doors)
             rangescan = LidarScan(lidar);
@@ -94,7 +86,7 @@ for i = 1:length(reference_path(:,1))
             res = control_system(odometry,ref,distance_to_wall,theta_correction,i);
             x_real=res(3);
             y_real=res(4);
-            pioneer_set_controls(sp,res(1)+50,res(2));
+            pioneer_set_controls(sp,res(1)+70,res(2));
         else         
             theta_correction = adjustment(rangescan);
             if door_detected_front
@@ -111,13 +103,23 @@ for i = 1:length(reference_path(:,1))
                  distance_to_wall = result(4);
 
             end
-                       
+           
+            % Check if we need to go to the next reference point. list numbers may be tuned
+            if i <= 14 && (x_real > ref(1))            
+                break
+            elseif i>14 && i <= 57 && y_real > ref(2)
+                break
+            elseif i >57 && i <= 87 && x_real  < ref(1)
+                break
+            elseif i > 87 && i <= 101 && y_real < ref(2)
+                break
+            end
         end
         
     end
     fprintf('POINT REACHED: %d', i)
 end
-%driveLab(sp,2);
+driveLab(sp,2);
 delete(odometrytmr);
 pioneer_close(sp);
 serial_port_stop(sp);
@@ -141,8 +143,8 @@ function nearby_doors = doors_in_range(doors,odom)
 % to start searching for the door
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 disp(odom)
-%start_coordinates  =[3600,2600]; % from lab mm
-start_coordinates = [6000,7125];% mm from hall
+start_coordinates  =[3600,2600]; % from lab mm
+%start_coordinates = [6000,7125];% mm from hall
 global door_index;
 odom_range_threshold = 1000; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error

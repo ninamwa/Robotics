@@ -4,7 +4,7 @@ global door_index
 pause_turning = 2;
 pause_drive_forward = distance_to_door/50 + 8;
 if door_index == 1
-    pause_drive_forward = pause_drive_forward + 6;
+    pause_drive_forward = pause_drive_forward + 10;
 end
 
 if LeftRightFront == 2

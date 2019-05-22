@@ -86,10 +86,10 @@ for i=1:length(x)
     end
 end
 
-after=y(middle_index -5);
-before = y(middle_index +5);
-plot(x(middle_index-5),after,'o');
-plot(x(middle_index+5),before,'o');
+after=y(middle_index -8);
+before = y(middle_index +8);
+plot(x(middle_index-8),after,'o');
+plot(x(middle_index+8),before,'o');
 hold off
 
 %% Check y values in before - middle - after
