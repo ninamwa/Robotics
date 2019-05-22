@@ -1,5 +1,7 @@
+
 function ans = lidarDoor(nearby_doors,ranges)  %input: ranges
 % Odometry in mm
+
 % Start_coordinates in mm, worldcoordinates
 
 % doors: x,y, 0:RIGHT/1:LEFT/2:FRONT, 0:NOTFOUND/1:FOUND/, indexl
@@ -161,5 +163,7 @@ if R_index ~=0
     plot(rightpoints(R_index,1),rightpoints(R_index,2),'*')
 end
 hold off
+filename = "plotdoor" + num2str(R_index) +".fig";
+savefig(filename)
 
 end
