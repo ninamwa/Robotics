@@ -2,6 +2,8 @@ function ans = lidarDoor(nearby_doors,ranges)  %input: ranges
 % Odometry in mm
 % Start_coordinates in mm, worldcoordinates
 
+% doors: x,y, 0:RIGHT/1:LEFT/2:FRONT, 0:NOTFOUND/1:FOUND/
+
 %% TODO: (problem) for halvåpen dør kommer max(norm) til å si at max er der 
 %døren går uendelig innover, og ikke dørkarm, som kommer til å gi feil
 %dør start.
@@ -48,9 +50,8 @@ F_index = 0; % only used for plotting
 nearby_door_left=[];
 nearby_door_right=[];
 nearby_door_front=[];
-%% Read doors:
-doors = get_doors();
-% x,y, 0:RIGHT/1:LEFT/2:FRONT, 0:NOTFOUND/1:FOUND/
+
+
 
 %% SET NEARBY DOORS
 if ~isempty(nearby_doors)
@@ -91,7 +92,7 @@ if ~isempty(nearby_door_right)% Right door
         R_index = n; % used for plotting
         %doors(nearby_door_right(5),4)=1; 
         detect_door_right = true; % SET GLOBAL RIGHT DOOR TO TRUE
-        set_door_detected(nearby_door_right(5))% SET DOOR TO FOUND
+        %set_door_detected(nearby_door_right(5))% SET DOOR TO FOUND
     end
 end
 
@@ -114,7 +115,7 @@ if ~isempty(nearby_door_left)%  If left door
         L_index = n;
         % doors(nearby_door_left(5),4)=1; SET DOOR TO FOUND
         detect_door_left = true; % SET GLOBAL LEFT DOOR TO TRUE
-        set_door_detected(nearby_door_left(5)); % SET DOOR TO FOUND
+        %set_door_detected(nearby_door_left(5)); % SET DOOR TO FOUND
     end
 end
 if ~isempty(nearby_door_front)
@@ -140,7 +141,7 @@ if ~isempty(nearby_door_front)
     if norm(front_door(2))>0 && norm(front_door(2))< door_distance_front
         F_index = n; % used for plotting
         detect_door_front = true; % SET GLOBAL RIGHT DOOR TO TRUE
-        set_door_detected(nearby_door_front(5))% SET DOOR TO FOUND
+        %set_door_detected(nearby_door_front(5))% SET DOOR TO FOUND
     end
     end
 end

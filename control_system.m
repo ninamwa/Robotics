@@ -99,14 +99,14 @@ v = round(v);
 
 w = v_max*((1+K2*phi/alpha)*(tanh(K1*e)/e)*sin(alpha)+K3*tanh(alpha));
 w = round((w - w_offset)*(180/pi))  ;
-fprintf("w: %d",w);
-fprintf("phi: %d",phi);
-fprintf("alpha: %d",alpha);
+fprintf("w: %d ",w);
+fprintf("phi: %d ",phi);
+fprintf("alpha: %d ",alpha);
 
-if w > 100
-    w = 30;
-elseif w < -100
-    w = -30;
+if w > 50
+    w = 20;
+elseif w < -50
+    w = -20;
 end
 
 if isnan(w)

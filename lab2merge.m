@@ -1,10 +1,8 @@
 function lab2merge()
 delete(timerfindall);
-global sp
 sp = serial_port_start();
 pioneer_init(sp);
-global lidar;
-SetupLidar();
+lidar = SetupLidar();
 
 %{
 do not need lidar timer
@@ -21,25 +19,14 @@ odometrytmr = timer('ExecutionMode', 'FixedRate', ...
 
 %start(lidartmr);
 start(odometrytmr);
-global rangescan;
 global odometry;
-global door_detected_right;
-global door_detected_left;
-global door_detected_front;
+
 door_detected_right = false;
 door_detected_left = false;
 door_detected_front = false;
-global distance_to_door;
 distance_to_door = 0;
-
 global door_index;
 door_index = 1;
-
-global start_coordinates;
-%start_coordinates  =[3600,2600]; % from lab mm
-start_coordinates = [6000,7125];% mm from hall
-
-global doors
 %% TODO: Legg inn 6177,7000,2,0 nederst i doors_edit.txt hvis vi skal ha med front door.
 
 doors = dlmread('Doors_edit.txt'); % [x,y,bol,detected] bol=1 right, bol=0 left, bol=2 front
@@ -69,20 +56,19 @@ end
 %driveLab(sp,1);
 for i = 1:length(reference_path(:,1))
     ref = reference_path(i,1:2)*1000;
-    disp(odometry);
-    
-    disp(ref)
+    fprintf("odom %d: ",odometry);
+    fprintf("ref %d: ",ref);
     fprintf('error: %d\n', norm(odometry(1:2)-ref))
     while norm(odometry(1:2)-ref)>150
         %% CHECK FOR NEARBY DOORS
-        nearby_doors = doors_in_range(start_coordinates,odometry);
+        nearby_doors = doors_in_range(doors,odometry);
         if ~isempty(nearby_doors)
             %nearby_doors
             rangescan = LidarScan(lidar);
-            result = lidarDoor(nearby_doors,rangescan);
-            door_detected_left = result(1);
-            door_detected_right = result(2);
-            door_detected_front = result(3);
+            LD_result = lidarDoor(nearby_doors,rangescan);
+            door_detected_left = LD_result(1);
+            door_detected_right = LD_result(2);
+            door_detected_front = LD_result(3);
             disp(door_detected_right);
         end
         %hold on;
@@ -101,14 +87,17 @@ for i = 1:length(reference_path(:,1))
             %disp(res)
         else         
             if door_detected_front
-                detect_door_action(2);%front
+                detect_door_action(sp,2,lidar);%front
+                door_detected_front = false;
             elseif door_detected_right
-                detect_door_action(1);%right
-                distance_to_door = result(4);
-                disp(distance_to_door - 835);
+                detect_door_action(sp,1,lidar);%right
+                door_detected_right = false;
+                distance_to_door = LD_result(4);
+                fprintf("correction %d :",distance_to_door - 835);       
             elseif door_detected_left 
-                detect_door_action(0);%left
-                distance_to_door = result(4);
+                 detect_door_action(sp,0,lidar);%left
+                 door_detected_left = false;
+                 distance_to_door = result(4);
 
             end
             %% Check if we need to go to the next reference point. list numbers may be tuned
@@ -146,13 +135,14 @@ global odometry;
 odometry = pioneer_read_odometry();
 end
 
-function nearby_doors = doors_in_range(start_coordinates,odom)
+function nearby_doors = doors_in_range(doors,odom)
 % For all doors in list, check if we are close enought, regarding odometry,
 % to start searching for the door
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 disp(odom)
+%start_coordinates  =[3600,2600]; % from lab mm
+start_coordinates = [6000,7125];% mm from hall
 global door_index;
-doors = get_doors();
 odom_range_threshold = 1000; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error
 i=door_index; % must be incremented
