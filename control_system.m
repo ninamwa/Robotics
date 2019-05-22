@@ -1,5 +1,4 @@
 function res = control_system(odom,theta_adjust,distance_to_door,ref,nr)
-
 %tuned parameters
 h = true;
 if h
@@ -50,8 +49,9 @@ elseif nr <= 87
 elseif nr <= 101 
     x = odom(1) - correction;
     y = odom(2);
-x = odom(1) 
-y= odom(2);
+end
+%x = odom(1) 
+%y= odom(2);
 if odom(3)<= 2048
     theta = ((2*pi) / 4096) * odom(3);
 else 

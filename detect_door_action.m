@@ -39,6 +39,7 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
     pause(pause_turning)
     pioneer_set_controls(sp,0,0);
     pause(1)
+    disp('her skal vi skanne')
     rangescan = LidarScan(lidar);
     pause(1)
     % Get door status and Play sound

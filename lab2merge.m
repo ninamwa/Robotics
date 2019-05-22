@@ -86,27 +86,28 @@ for i = 1:length(reference_path(:,1))
             door_detected_left = result(1);
             door_detected_right = result(2);
             door_detected_front = result(3);
-            distance_to_door = result(4);
             disp(door_detected_right);
         end
-        hold on;
-        plot(odometry(1), odometry(2), 'k.');
-        drawnow;
-        hold off;
+        %hold on;
+        %plot(odometry(1), odometry(2), 'k.');
+        %drawnow;
+        %hold off;
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
             res = control_system(odometry,theta_adjust,distance_to_door,ref,i);
             pioneer_set_controls(sp,res(1),res(2));
         else
             %angles_adjust = 0;
-            theta_adjust = adjustment(rangescan);
-            theta_adjust
-           
+            %theta_adjust = adjustment(rangescan);          
             if door_detected_front
                 detect_door_action(2);%front
             elseif door_detected_right
                 detect_door_action(1);%right
+                distance_to_door = result(4);
+                disp(distance_to_door - 835);
             elseif door_detected_left 
                 detect_door_action(0);%left
+                distance_to_door = result(4);
+
             end
             %% Check if we need to go to the next reference point. list numbers may be tuned
             if i <= 15 && (odometry(1) > ref(1))
@@ -177,7 +178,7 @@ function nearby_doors = doors_in_range(start_coordinates,odom)
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 global door_index;
 doors = get_doors();
-odom_range_threshold = 900; % How far is odomotry from a existing door?
+odom_range_threshold = 1000; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error
 i=door_index; % must be incremented
 odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
