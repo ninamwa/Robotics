@@ -26,6 +26,7 @@ door_detected_right = false;
 door_detected_left = false;
 door_detected_front = false;
 distance_to_wall = 0;
+theta_correction=0;
 global door_index;
 door_index = 1;
 
@@ -79,11 +80,12 @@ for i = 1:length(reference_path(:,1))
         %drawnow;
         %hold off;
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
-            res = control_system(odometry,ref,distance_to_wall,i);
+            res = control_system(odometry,ref,distance_to_wall,theta_correction,i);
             x_real=res(3);
             y_real=res(4);
             pioneer_set_controls(sp,res(1),res(2));
         else         
+            theta_correction = adjustment(rangescan)
             if door_detected_front
                 detect_door_action(sp,2,lidar);%front
                 door_detected_front = false;

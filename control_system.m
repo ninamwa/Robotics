@@ -1,4 +1,4 @@
-function res = control_system(odom,ref,distance_to_wall,nr)
+function res = control_system(odom,ref,distance_to_wall,theta_correction,nr)
 %tuned parameters
 h = true;
 if h
@@ -52,6 +52,8 @@ if odom(3)<= 2048
 else 
     theta = (((2*pi) / 4096) * odom(3))-(2*pi);
 end
+
+theta = theta - theta_correction;
 
 if theta>pi
     theta = theta-2*pi;
