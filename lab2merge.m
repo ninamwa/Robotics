@@ -44,6 +44,8 @@ hold on
 reference_path = dlmread('test11.txt');
 
 driveLab(sp,1);
+x_start=odometry(1);
+y_start=odometry(2);
 x_real=odometry(1);
 y_real=odometry(2);
 reference_path(:,1)=reference_path(:,1)*1000+odometry(1);
@@ -68,7 +70,7 @@ for i=1:length(reference_path(:,1))
     disp(norm(odometry(1:2)-ref))
     
     while norm([x_real,y_real]-ref)>150
-        nearby_doors = doors_in_range(doors,[x_real,y_real]);
+        nearby_doors = doors_in_range(doors,[x_real,y_real],x_start,y_start);
         if ~isempty(nearby_doors)
             rangescan = LidarScan(lidar);
             LD_result = lidarDoor(nearby_doors,rangescan);
@@ -136,20 +138,21 @@ end
 function odometrytimerCallback(src, event)
 global odometry;
 odometry = pioneer_read_odometry();
+disp(odometry);
 end
 
-function nearby_doors = doors_in_range(doors,odom)
+function nearby_doors = doors_in_range(doors,odom,x_start,y_start)
 % For all doors in list, check if we are close enought, regarding odometry,
 % to start searching for the door
 % OBS! Odometry errors will make this a problem after a while... tune threshold
-disp(odom)
+%disp(odom)
 start_coordinates  =[3600,2600]; % from lab mm
 %start_coordinates = [6000,7125];% mm from hall
 global door_index;
 odom_range_threshold = 1000; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error
 i=door_index; % must be incremented
-odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
+odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1)-x_start,odom(2)-y_start]);
 %odom
 %odom_range
 if odom_range < odom_range_threshold && doors(i,4)==0
