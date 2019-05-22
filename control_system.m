@@ -34,7 +34,7 @@ correction=0;
 if distance_to_wall ~= 0 
   correction = distance_to_wall - 835; %mm, half hall
 end
-if nr <= 15
+if nr <= 14
     x = odom(1);
     y = odom(2)+correction;
 elseif nr <= 57 
@@ -53,7 +53,7 @@ else
     theta = (((2*pi) / 4096) * odom(3))-(2*pi);
 end
 
-theta = theta - theta_correction;
+theta = theta + theta_correction;
 
 if theta>pi
     theta = theta-2*pi;
@@ -91,9 +91,9 @@ v = round(v);
 
 w = v_max*((1+K2*phi/alpha)*(tanh(K1*e)/e)*sin(alpha)+K3*tanh(alpha));
 w = round((w - w_offset)*(180/pi))  ;
-fprintf("w: %d ",w);
-fprintf("phi: %d ",phi);
-fprintf("alpha: %d ",alpha);
+%fprintf("w: %d ",w);
+%fprintf("phi: %d ",phi);
+%fprintf("alpha: %d ",alpha);
 
 if w > 50
     w = 20;

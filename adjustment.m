@@ -12,24 +12,33 @@ for k = 1:341
         deleted_ranges = [deleted_ranges, k];
     end
 end
-%plot(new_ranges)
+%plot(new_ranges
+min = 10000;
+min_index = 1;
+for i = 4: length(new_ranges)-7
+    if (new_ranges(i-2) + new_ranges(i) + new_ranges(i+2)) < min
+        min_index = i ;
+        min = (new_ranges(i-2) + new_ranges(i) + new_ranges(i+2));
+    end
+end
+    
+%[value, index] = min(new_ranges); %rightpoints
 
-[value, index] = min(new_ranges); %rightpoints
-
-if index < 84  
+if min_index < 84  
     for i = 1:length(deleted_ranges)
-        if deleted_ranges(i) > index && deleted_ranges(i) < 84
+        if deleted_ranges(i) > min_index && deleted_ranges(i) < 84
             deleted_index = deleted_index + 1;
         end
     end 
 else 
     for i = 1:length(deleted_ranges)
-        if deleted_ranges(i) < index && deleted_ranges(i) > 84
+        if deleted_ranges(i) < min_index && deleted_ranges(i) > 84
             deleted_index = deleted_index + 1;
         end
     end 
 end 
-difference = 84 + deleted_index - index; %index = 1??
+min_index
+difference = 84 + deleted_index - min_index;
 angles_adjust = (240/682)*difference;
 angles_adjust= angles_adjust * pi/180;
 

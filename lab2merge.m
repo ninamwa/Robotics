@@ -61,11 +61,21 @@ y_real=0;
 %driveLab(sp,1);
 for i = 1:length(reference_path(:,1))
     ref = reference_path(i,1:2)*1000;
-    fprintf("odom %d: ",odometry);
-    fprintf("ref %d: ",ref);
-    fprintf('error: %d\n', norm(odometry(1:2)-ref))
+    disp(odometry)
+    disp(ref)
+    disp(norm(odometry(1:2)-ref))
     
     while norm([x_real,y_real]-ref)>150
+     % Check if we need to go to the next reference point. list numbers may be tuned
+        if i <= 14 && (x_real > ref(1))
+            break
+        elseif i>14 && i <= 57 && y_real > ref(2)
+            break
+        elseif i >57 && i <= 87 && x_real  < ref(1)
+            break
+        elseif i > 87 && i <= 101 && y_real < ref(2)
+            break
+        end
         nearby_doors = doors_in_range(doors,[x_real,y_real]);
         if ~isempty(nearby_doors)
             rangescan = LidarScan(lidar);
@@ -84,9 +94,9 @@ for i = 1:length(reference_path(:,1))
             res = control_system(odometry,ref,distance_to_wall,theta_correction,i);
             x_real=res(3);
             y_real=res(4);
-            pioneer_set_controls(sp,res(1),res(2));
+            pioneer_set_controls(sp,res(1)+50,res(2));
         else         
-            theta_correction = adjustment(rangescan)
+            theta_correction = adjustment(rangescan);
             if door_detected_front
                 detect_door_action(sp,2,lidar,distance_to_door);%front
                 door_detected_front = false;
@@ -101,17 +111,7 @@ for i = 1:length(reference_path(:,1))
                  distance_to_wall = result(4);
 
             end
-            % Check if we need to go to the next reference point. list numbers may be tuned
-            if i <= 15 && (odometry(1) > ref(1))
-                break
-            elseif i>15 && i <= 57 && odometry(2) > ref(2)
-                break
-            elseif i >57 && i <= 87 && odometry(1)  < ref(1)
-                break
-            elseif i > 87 && i <= 101 && odometry(2) < ref(2)
-                break
-            end
-            
+                       
         end
         
     end
