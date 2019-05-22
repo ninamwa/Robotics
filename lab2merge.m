@@ -74,6 +74,7 @@ for i = 1:length(reference_path(:,1))
             door_detected_right = LD_result(2);
             door_detected_front = LD_result(3);
             disp(door_detected_right);
+            distance_to_door = LD_result(5);
         end
         %hold on;
         %plot(odometry(1), odometry(2), 'k.');
@@ -87,15 +88,15 @@ for i = 1:length(reference_path(:,1))
         else         
             theta_correction = adjustment(rangescan)
             if door_detected_front
-                detect_door_action(sp,2,lidar);%front
+                detect_door_action(sp,2,lidar,distance_to_door);%front
                 door_detected_front = false;
             elseif door_detected_right
-                detect_door_action(sp,1,lidar);%right
+                detect_door_action(sp,1,lidar,distance_to_door);%right
                 door_detected_right = false;
                 distance_to_wall = LD_result(4);
                 fprintf("correction %d :",distance_to_wall - 835);       
             elseif door_detected_left 
-                 detect_door_action(sp,0,lidar);%left
+                 detect_door_action(sp,0,lidar,distance_to_door);%left
                  door_detected_left = false;
                  distance_to_wall = result(4);
 

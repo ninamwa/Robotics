@@ -1,6 +1,11 @@
-function detect_door_action(sp,LeftRightFront,lidar)%L:0,R:1,F:2
+function detect_door_action(sp,LeftRightFront,lidar,distance_to_door)%L:0,R:1,F:2
 global door_index
+
 pause_turning = 2;
+pause_drive_forward = distance_to_door/50 + 8;
+if door_index == 1
+    pause_drive_forward = pause_drive_forward + 2;
+end
 
 if LeftRightFront == 2
     pioneer_set_controls(sp,0,0);
@@ -14,7 +19,7 @@ if LeftRightFront == 2
 elseif LeftRightFront ==0 || LeftRightFront ==1
     if door_index ~= 6
         pioneer_set_controls(sp,50,0);
-        pause(8);
+        pause(pause_drive_forward);
         pioneer_set_controls(sp,0,0);
     end
     if LeftRightFront == 1 %right
