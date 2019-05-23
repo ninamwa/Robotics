@@ -6,8 +6,8 @@ clf
 axis([-100,20000,-100,20000])
 hold on
 
-reference_path(:,1)=reference_path(:,1)*1000+2400; 
-reference_path(:,2)=reference_path(:,2)*1000+3200;
+reference_path(:,1)=reference_path(:,1)*1000;%+2400; 
+reference_path(:,2)=reference_path(:,2)*1000;%+3200;
 
 x = reference_path(:,1);
 y = reference_path(:,2);

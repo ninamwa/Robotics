@@ -1,4 +1,6 @@
 function lab2merge()
+%drive from hall: kommentar på startcoord nederst, drivelab er kommentert
+%ut og på linje 57,58
 delete(timerfindall);
 sp = serial_port_start();
 pioneer_init(sp);
@@ -42,7 +44,8 @@ doors = dlmread('Doors_edit.txt'); % [x,y,bol,detected] bol=1 right, bol=0 left,
 
 reference_path = dlmread('test11.txt');
 
-theta_correction = driveLab(sp,lidar,1);
+%theta_correction = driveLab(sp,lidar,1);
+theta_correction =0; % NEEDS TO BE REMOVED!!!!!
 tic;
 t=toc;
 while t<2
@@ -51,8 +54,8 @@ end
 
 x_real=odometry(1);
 y_real=odometry(2);
-reference_path(:,1)=reference_path(:,1)*1000 +odometry(1);
-reference_path(:,2)=reference_path(:,2)*1000 +odometry(2);
+reference_path(:,1)=reference_path(:,1)*1000; %+odometry(1);
+reference_path(:,2)=reference_path(:,2)*1000;%+odometry(2);
 dlmwrite('test11corrected.txt', reference_path,'newline','pc');
 
 %{
@@ -156,8 +159,8 @@ function nearby_doors = doors_in_range(doors,odom)
 % to start searching for the door
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 %disp(odom)
-start_coordinates  =[3600,2900]; % from lab mm
-%start_coordinates = [6000,7125];% mm from hall
+%start_coordinates  =[3600,2900]; % from lab mm
+start_coordinates = [6000,7125];% mm from hall
 global door_index;
 odom_range_threshold = 1000; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error

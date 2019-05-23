@@ -10,18 +10,24 @@ if door_index == 3
     pause_drive_forward = pause_drive_forward + 2;
 end
 
-if LeftRightFront == 2
+if LeftRightFront == 2  %FRONT
+    pause_drive_forward = (distance_to_door-835)/50; % should be to the middle of the hall, think this is too short
+    pioneer_set_controls(sp,50,0);
+    pause(pause_drive_forward)
     pioneer_set_controls(sp,0,0);
     pause(1);
     rangescan = LidarScan(lidar);
     pause(1);
-    status =  get_door_status_front(rangescan);
-    distance_to_wall =0; % TA STILLING
+    [status,distance_to_wall] =  get_door_status(rangescan);
     playSound(status);
     pause(3);
+    pioneer_set_controls(sp,0,45);
+    pause(pause_turning);
+    pioneer_set_controls(sp,0,0);
+    pause(1);
     door_index = door_index+1;    
 elseif LeftRightFront ==0 || LeftRightFront ==1
-    if door_index ~= 6
+    if door_index ~= 6 % left and right
         pioneer_set_controls(sp,50,0);
         pause(pause_drive_forward);
         pioneer_set_controls(sp,0,0);
