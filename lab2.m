@@ -66,6 +66,9 @@ for i=1:length(reference_path(:,1))
     disp(odometry)
     disp(ref)
     disp(norm(odometry(1:2)-ref))
+    if changeReference(i,ref,x_real,y_real)
+        continue
+    end
     
     while norm([x_real,y_real]-ref)>150
         nearby_doors = doors_in_range(doors,[x_real,y_real]);
@@ -103,15 +106,13 @@ for i=1:length(reference_path(:,1))
                  distance_to_wall = result(4);
 
             end
+            
+            corrected_odom = correctOdometry(i,distance_to_wall);
+            x_real = corrected_odom(1);
+            y_real = corrected_odom(2);
            
             % Check if we need to go to the next reference point. list numbers may be tuned
-            if i <= 14 && (x_real > ref(1))            
-                break
-            elseif i>14 && i <= 57 && y_real > ref(2)
-                break
-            elseif i >57 && i <= 87 && x_real  < ref(1)
-                break
-            elseif i > 87 && i <= 101 && y_real < ref(2)
+            if changeReference(i,ref,x_real,y_real)
                 break
             end
         end
