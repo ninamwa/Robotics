@@ -41,6 +41,7 @@ min_index
 difference = 84 + deleted_index - min_index;
 angles_adjust = (240/682)*difference;
 angles_adjust= angles_adjust * pi/180;
+angles_adjust
 
 end
   

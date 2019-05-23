@@ -1,4 +1,4 @@
-function driveLab(sp,type)
+function theta_adjust = driveLab(sp,lidar,type)
 %measurements 2850, 4200
 %drive out of lab 
 %delete(timerfindall);
@@ -17,7 +17,12 @@ if type == 1
     pioneer_set_controls(sp,0,-45);
     pause(2);
     pioneer_set_controls(sp,0,0);
-    pause(2)
+    pause(0.5);
+    rangescan = LidarScan(lidar);
+    theta_adjust = adjustment(rangescan);
+    pause(0.5);
+    
+    
 end
 %drive into lab
 if type==2
@@ -28,6 +33,7 @@ if type==2
     pioneer_set_controls(sp,100,0);
     pause(2.85);
     pioneer_set_controls(sp,0,0); 
+    theta_adjust = 0;
 end
 
 

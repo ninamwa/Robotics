@@ -153,7 +153,7 @@ end
 ans = [detect_door_left, detect_door_right, detect_door_front, distance_to_wall,distance_to_door];
 
 % Plot rangescan and doors found
-
+%{
 figure(2)
 plot(leftpoints(:,1),leftpoints(:,2))
 hold on
@@ -165,5 +165,5 @@ end
 hold off
 filename = "plotdoor" + num2str(R_index) +".fig";
 savefig(filename)
-
+%}
 end

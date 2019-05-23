@@ -1,4 +1,4 @@
-function status = get_door_status(ranges)
+function [status, distance_to_wall] = get_door_status(ranges)
 
 %% TO TEST WITH LIDAR:
 %SetupLidar(); MATLAB MÅ VÆRE 1,  port_name ='/dev/tty.usbmodem1421';
@@ -109,4 +109,5 @@ elseif before <closed_threshold && middle <closed_threshold && after <closed_thr
 else
     status = 'half';
 end
+
 end

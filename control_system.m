@@ -1,5 +1,6 @@
-function res = control_system(odom,ref,distance_to_wall,theta_correction,nr)
+function res = control_system(ref,distance_to_wall,theta_correction,nr)
 %tuned parameters
+global odometry;
 h = true;
 if h
     if nr > 43 
@@ -30,30 +31,17 @@ v_max=50;
 
 w_offset = 0;
 
-correction=0;
-if distance_to_wall ~= 0 
-  correction = distance_to_wall - 835; %mm, half hall
-end
-if nr <= 14
-    x = odom(1);
-    y = odom(2)+correction;
-elseif nr <= 57 
-    x = odom(1)+ correction;
-    y = odom(2);
-elseif nr <= 87 
-    x = odom(1) ;
-    y = odom(2)- correction;
-elseif nr <= 101 
-    x = odom(1) - correction;
-    y = odom(2);
-end
-if odom(3)<= 2048
-    theta = ((2*pi) / 4096) * odom(3);
+corrected_odom = correctOdometry(nr,distance_to_wall);
+x = corrected_odom(1);
+y = corrected_odom(2);
+if odometry(3)<= 2048
+    theta = ((2*pi) / 4096) * odometry(3);
 else 
-    theta = (((2*pi) / 4096) * odom(3))-(2*pi);
+    theta = (((2*pi) / 4096) * odometry(3))-(2*pi);
 end
 
 theta = theta + theta_correction;
+
 
 if theta>pi
     theta = theta-2*pi;
@@ -91,9 +79,7 @@ v = round(v);
 
 w = v_max*((1+K2*phi/alpha)*(tanh(K1*e)/e)*sin(alpha)+K3*tanh(alpha));
 w = round((w - w_offset)*(180/pi))  ;
-%fprintf("w: %d ",w);
-%fprintf("phi: %d ",phi);
-%fprintf("alpha: %d ",alpha);
+fprintf("w: %d, phi: %d, alpha: %d \n",w,phi,alpha);
 
 if w > 50
     w = 20;
