@@ -1,5 +1,5 @@
 
-function ans = lidarDoor(nearby_doors,ranges)  %input: ranges
+function door_bol = lidarDoor(nearby_doors,ranges)  %input: ranges
 % Odometry in mm
 
 % Start_coordinates in mm, worldcoordinates
@@ -150,7 +150,7 @@ end
 
 
 % Booleans that execute an event in cause of true
-ans = [detect_door_left, detect_door_right, detect_door_front, distance_to_wall,distance_to_door];
+door_bol = [detect_door_left, detect_door_right, detect_door_front, distance_to_wall,distance_to_door];
 
 % Plot rangescan and doors found
 %{

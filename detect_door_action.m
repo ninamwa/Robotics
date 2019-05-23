@@ -1,6 +1,6 @@
-function distance_to_wall = detect_door_action(sp,LeftRightFront,lidar,distance_to_door)%L:0,R:1,F:2
-global door_index
 
+function detect_door_action(sp,LeftRightFront,lidar,distance_to_door)%L:0,R:1,F:2global door_index
+global door_index
 pause_turning = 2;
 pause_drive_forward = distance_to_door/50 + 10;
 if door_index == 1
@@ -18,7 +18,8 @@ if LeftRightFront == 2  %FRONT
     pause(1);
     rangescan = LidarScan(lidar);
     pause(1);
-    [status,distance_to_wall] =  get_door_status(rangescan);
+    % TA STILLING:
+    status =  get_door_status(rangescan);
     playSound(status);
     pause(3);
     pioneer_set_controls(sp,0,45);
@@ -27,7 +28,7 @@ if LeftRightFront == 2  %FRONT
     pause(1);
     door_index = door_index+1;    
 elseif LeftRightFront ==0 || LeftRightFront ==1
-    if door_index ~= 6 % left and right
+    if door_index ~= 6
         pioneer_set_controls(sp,50,0);
         pause(pause_drive_forward);
         pioneer_set_controls(sp,0,0);
@@ -50,7 +51,7 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
     rangescan = LidarScan(lidar);
     pause(1)
     % Get door status and Play sound
-    [status,distance_to_wall] = get_door_status(rangescan);
+    status = get_door_status(rangescan);
     playSound(status);
     pause(3);
     % Turn 90degrees

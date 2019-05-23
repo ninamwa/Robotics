@@ -4,7 +4,7 @@ correction=0;
 if distance_to_wall ~= 0 
   correction = distance_to_wall - 835; %mm, half hall
 end
-fprintf("odom1: %d, odom2: %d \n", odometry(1), odometry(2))
+fprintf('odom1: %d, odom2: %d \n', odometry(1), odometry(2))
 if nr <= 12
     x = odometry(1);
     y = odometry(2)+correction;
