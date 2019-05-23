@@ -100,6 +100,7 @@ for i=1:length(reference_path(:,1))
             pioneer_set_controls(sp,res(1)+50,res(2));
         else         
             theta_correction = adjustment(rangescan);
+            reference_path(:,1:2) =reference_path(:,1:2) * [cos(theta_correction), -sin(theta_corrction); sin(theta_correction), cos(theta_correction)]; 
             fprintf("theta_correction %d :",theta_correction)
             if door_detected_front
                 distance_to_wall = detect_door_action(sp,2,lidar,distance_to_door);%front

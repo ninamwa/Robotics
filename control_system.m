@@ -40,8 +40,8 @@ else
     theta = (((2*pi) / 4096) * odometry(3))-(2*pi);
 end
 
-theta = theta + theta_correction;
-
+%theta = theta + theta_correction;
+fprintf("theta: %d", theta);
 
 if theta>pi
     theta = theta-2*pi;
