@@ -9,9 +9,12 @@ end
 if door_index == 3
     pause_drive_forward = pause_drive_forward + 2;
 end
+if door_index == 10
+    pause_drive_forward = distance_to_door/50;
+end
+
 
 if LeftRightFront == 2  %FRONT
-    pause_drive_forward = (distance_to_door-835)/50; % should be to the middle of the hall, think this is too short
     pioneer_set_controls(sp,50,0);
     pause(pause_drive_forward)
     pioneer_set_controls(sp,0,0);

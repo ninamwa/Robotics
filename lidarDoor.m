@@ -1,4 +1,3 @@
-
 function door_bol = lidarDoor(nearby_doors,ranges)  %input: ranges
 % Odometry in mm
 
@@ -13,7 +12,7 @@ x= [];
 y=[];
 distance_to_wall = 0;
 distance_to_door = 0;
-lidar_error_range = 15; % can be tuned
+lidar_error_range = 20; % can be tuned
 for n = 1:length(ranges)
     if ranges(n)> lidar_error_range
         xn = cosd(-30+ (n-1)*(240/682)) *ranges(n);
@@ -28,21 +27,20 @@ points=[x,y];
 %% Set rightpoints and leftpoints
 leftpoints = [];
 rightpoints = [];
-for i = 1:length(x)
-    if points(i,1)<0 && points(i,2)<2000  % ønsker ikke å kutte liste mer, for out of range problem i løkke
-        leftpoints= [points(i,:);leftpoints];
+for q = 1:length(x)
+    if points(q,1)<0 && points(q,2)<2000  % ønsker ikke å kutte liste mer, for out of range problem i løkke
+        leftpoints= [points(q,:);leftpoints];
     end
-    if points(i,1)>0 && points(i,2)<2000
-        rightpoints= [rightpoints;points(i,:)];
+    if points(q,1)>0 && points(q,2)<2000
+        rightpoints= [rightpoints;points(q,:)];
     end
 end
-%% Door_edit.txt is most likely not correct. measure the first door in world to check.
 
 %% Set thresholds and parameters
 door_threshold = 60; %60? think 70 is too big. How big norm represents a door?
 search_range = 1500; % 1000? How far ahead should we look for doors?
 door_distance = 500; %2 is probably to small. How close should the robot be to the door before is it denoted as detected?
-door_distance_front = 1700;
+door_distance_front = 1500;
 detect_door_left = false; % results
 detect_door_right = false; % results
 detect_door_front = false; % results
@@ -111,7 +109,11 @@ if ~isempty(nearby_door_left)%  If left door
         end
     end
     if norm(left_door(2))<door_distance % && norm(left_door(2))>0
-        distance_to_wall = 1670 - leftpoints(n,1);
+        distance_to_wall = 1670 + leftpoints(n,1);
+        leftpoints(n,1)
+        %if distance_to_wall == 0
+        %    distance_to_wall = 835;
+        %end
         distance_to_door = leftpoints(n,2);
         L_index = n;
         % doors(nearby_door_left(5),4)=1; SET DOOR TO FOUND
@@ -120,31 +122,47 @@ if ~isempty(nearby_door_left)%  If left door
     end
 end
 if ~isempty(nearby_door_front)
-    all_points = [leftpoints;rightpoints];
+    all_points = [leftpoints;flip(rightpoints)];
     front_points = [];
     for n=1:length(all_points(:,1))
-        if sqrt(all_points(n,1)^2) < 300 && all_points(n,2) > 100 
+        if sqrt(all_points(n,1)^2) < 1000 && all_points(n,2) > 500 
             front_points = [front_points;all_points(n,:)];
         end
     end
     if~isempty(front_points)
-        for i = 1:length(front_points(:,1))-2
-            norm_front(i) = norm(front_points(i,:)-front_points(i+2,:));
-            if norm_front(i) > door_threshold     % Find first maxnorm on rightwall
-                Y= norm_left(n);
+        for q = 1:length(front_points)-1
+            if sqrt(front_points(q,1)^2) < 10
+                middle_reading = front_points(q-1,2);
+                before_val = front_points(q+10,2);
+                after_val = front_points(q-10,2);
+                distance_to_door = (middle_reading + before_val + after_val)/3;
+                break
+            end
+            if distance_to_door < door_distance_front
+                detect_door_front = true;
+                distance_to_door = distance_to_door - 835 - 70; % distance_to_door- half of hall - door
+                distance_to_wall = 835;
+            end
+        end
+        %{
+        for q = 1:length(front_points(:,1))-2
+            norm_front(q) = norm(front_points(q,:)-front_points(q+2,:));
+            if norm_front(q) > door_threshold     % Find first maxnorm on rightwall
+                Y= norm_front(q);
                 % Save start position of door
-                front_door = [front_points(n,1),front_points(n,2)];
+                front_door = [front_points(q,1),front_points(q,2)];
                 break
             end
         end
     % If the distance to the door is less than door_distance, we
     % want a DOOR event to occur, and list the door as detected
     if norm(front_door(2))>0 && norm(front_door(2))< door_distance_front
-        F_index = n; % used for plotting
+        F_index =q; % used for plotting
         detect_door_front = true; % SET GLOBAL RIGHT DOOR TO TRUE
-        distance_to_door = front_points(n,2);
+        distance_to_door = front_points(q,2);
         %set_door_detected(nearby_door_front(5))% SET DOOR TO FOUND
     end
+        %}
     end
 end
 
@@ -153,17 +171,11 @@ end
 door_bol = [detect_door_left, detect_door_right, detect_door_front, distance_to_wall,distance_to_door];
 
 % Plot rangescan and doors found
-%{
-figure(2)
-plot(leftpoints(:,1),leftpoints(:,2))
-hold on
-plot(rightpoints(:,1),rightpoints(:,2))
-hold on
-if R_index ~=0
-    plot(rightpoints(R_index,1),rightpoints(R_index,2),'*')
-end
-hold off
-filename = "plotdoor" + num2str(R_index) +".fig";
-savefig(filename)
-%}
+%plot(leftpoints);
+%if L_index ~=0
+%    plot(leftpoints(L_index,1),leftpoints(L_index,2),'*');
+%end
+%filename = "plotdoor" + num2str(R_index) +".fig";
+%savefig(filename)
+
 end

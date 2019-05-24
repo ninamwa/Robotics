@@ -1,4 +1,4 @@
-function status = get_door_status()%ranges)
+function status = get_door_status(ranges)
 global door_index
 %% TO TEST WITH LIDAR:
 %SetupLidar(); MATLAB MÅ VÆRE 1,  port_name ='/dev/tty.usbmodem1421';
@@ -8,7 +8,7 @@ global door_index
 %halfopendoor.txt
 %opendoor.txt
 %closeddoor.txt
-ranges = dlmread('halfopendoor2.txt');
+%ranges = dlmread('halfopendoor2.txt');
 status= 'half';
 
 %% Process ranges
@@ -38,11 +38,11 @@ end
 
 x=points(:,1);
 y=points(:,2);
-figure(2)
-plot(x,y);
-hold on
+%figure(2)
+%plot(x,y);
+%hold on
 distance_to_wall = y(1);%y(length(y));
-plot(x(1),y(1),'o');
+%plot(x(1),y(1),'o');
 
 %plot(x(length(y)),y(length(y)),'o');
 
@@ -59,7 +59,7 @@ search_range_door = 170; % not used
 for i=1:length(x)
     if x(i)<-search_range_door
         before=y(i+1);
-        plot(x(i+1),before,'o');
+        %plot(x(i+1),before,'o');
         hold on
         break
     end
@@ -67,7 +67,7 @@ end
 for i=1:length(x)
     if x(i)<search_range_door
         after=y(i-1); 
-        plot(x(i-1),after,'*');
+       % plot(x(i-1),after,'*');
         hold on
         break
     end
@@ -81,7 +81,7 @@ for i=1:length(x)
             middle_index=i-1;
             middle=y(middle_index);
         end
-        plot(x(middle_index),middle,'*');
+       % plot(x(middle_index),middle,'*');
         break
     end
 end
@@ -110,7 +110,7 @@ else
     status = 'half';
 end
 
-if door_index == 6
+if door_index == 6 || door_index == 17
     status = 'open';
 end
 end
