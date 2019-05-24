@@ -69,6 +69,7 @@ for h =1:length(reference_path(:,1))
     disp(ref)
     disp(norm(odometry(1:2)-ref))
     if changeReference(h,ref,x_real,y_real)
+        fprintf('POINT REACHED: %d', h)
         continue
     end
     while norm([x_real,y_real]-ref)>150
@@ -95,13 +96,15 @@ for h =1:length(reference_path(:,1))
             prompt = 'What is the distance to the wall? ';
             distance_to_wall = input(prompt);
             fprintf('correction %d :',distance_to_wall - 835);
-            door_detected_right = false;
-            if door_index ==3
-                pioneer_set_controls(sp,45,0);
+            fprintf('door_index %d : ', door_index);
+            if door_index == 3
+                pioneer_set_controls(sp,0,0);
+                pioneer_set_controls(sp,0,45);
                 pause(2);
                 pioneer_set_controls(sp,0,0);
             end
-                door_index = door_index +1;
+            door_detected_right = false;
+            door_index = door_index +1;
             
             %corrected_odom = correctOdometry(h,distance_to_wall);
             %x_real = corrected_odom(1);
