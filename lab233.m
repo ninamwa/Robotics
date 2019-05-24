@@ -14,7 +14,6 @@ global odometry;
 door_detected_right = false;
 door_detected_left = false;
 door_detected_front = false;
-distance_to_wall = 0;
 theta_correction=0;
 global door_index;
 door_index = 1;
@@ -29,12 +28,17 @@ hold on
 reference_path = dlmread('test11.txt');
 
 driveLab(sp,1);
-x_start=odometry(1);
-y_start=odometry(2);
+global x_real
+global y_real
+global distance_to_wall
+global number
+number = 1;
+distance_to_wall = 0;
 x_real=odometry(1);
 y_real=odometry(2);
 reference_path(:,1)=reference_path(:,1)*1000+odometry(1);
 reference_path(:,2)=reference_path(:,2)*1000+odometry(2);
+dlmwrite('test11corrected.txt', reference_path,'newline','pc');
 
 % nytt
 x_ref = reference_path(:,1);
@@ -59,6 +63,7 @@ for k1 = 1:length(x)
 end
 
 for h =1:length(reference_path(:,1))
+    number = h;
     ref = reference_path(h,1:2);
     disp(odometry)
     disp(ref)
@@ -81,20 +86,26 @@ for h =1:length(reference_path(:,1))
             y_real=res(4);
             pioneer_set_controls(sp,res(1)+70,res(2));
         else         
-                theta_correction = 0;
+            theta_correction = 0;
+            pioneer_set_controls(sp,0,0);
+            pioneer_set_controls(sp,50,0);
+            pause(10);
+            pioneer_set_controls(sp,0,0);
+            
+            prompt = 'What is the distance to the wall? ';
+            distance_to_wall = input(prompt);
+            fprintf('correction %d :',distance_to_wall - 835);
+            door_detected_right = false;
+            if door_index ==3
+                pioneer_set_controls(sp,45,0);
+                pause(2);
                 pioneer_set_controls(sp,0,0);
-                pioneer_set_controls(sp,50,0);
-                pause(10);
-                pioneer_set_controls(sp,0,0);
-                prompt = 'What is the distance to the wall? ';
-                distance_to_wall = input(prompt);
-                fprintf('correction %d :',distance_to_wall - 835); 
-                door_detected_right = false;
+            end
                 door_index = door_index +1;
             
-            corrected_odom = correctOdometry(h,distance_to_wall);
-            x_real = corrected_odom(1);
-            y_real = corrected_odom(2);
+            %corrected_odom = correctOdometry(h,distance_to_wall);
+            %x_real = corrected_odom(1);
+            %y_real = corrected_odom(2);
            
             % Check if we need to go to the next reference point. list numbers may be tuned
             if changeReference(h,ref,x_real,y_real)
@@ -120,8 +131,15 @@ end
 
 
 function odometrytimerCallback(src, event)
-global odometry;
+global odometry
+global x_real
+global y_real
+global distance_to_wall
+global number
 odometry = pioneer_read_odometry();
+corrected = correctOdometry(number,distance_to_wall);
+x_real = corrected(1);
+y_real = corrected(2);
 end
 
 function nearby_doors = doors_in_range(doors,odom)

@@ -48,6 +48,7 @@ x_real=odometry(1);
 y_real=odometry(2);
 reference_path(:,1)=reference_path(:,1)*1000+odometry(1);
 reference_path(:,2)=reference_path(:,2)*1000+odometry(2);
+dlmwrite('test11corrected.txt', reference_path,'newline','pc');
 
 x = reference_path(:,1);
 y = reference_path(:,2);

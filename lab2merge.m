@@ -35,16 +35,9 @@ door_index = 1;
 %TODO: Legg inn 6177,7000,2,0 nederst i doors_edit.txt hvis vi skal ha med front door.
 
 doors = dlmread('Doors_edit.txt'); % [x,y,bol,detected] bol=1 right, bol=0 left, bol=2 front
-
-
-%figure(1);
-%clf
-%axis([-100,20000,-100,20000])
-%hold on
-
 reference_path = dlmread('test11.txt');
 
-%theta_correction = driveLab(sp,lidar,1);
+theta_correction = driveLab(sp,lidar,1);
 theta_correction =0; % NEEDS TO BE REMOVED!!!!!
 tic;
 t=toc;
@@ -54,29 +47,20 @@ end
 
 x_real=odometry(1);
 y_real=odometry(2);
-reference_path(:,1)=reference_path(:,1)*1000; %+odometry(1);
-reference_path(:,2)=reference_path(:,2)*1000;%+odometry(2);
+reference_path(:,1)=reference_path(:,1)*1000 +odometry(1);
+reference_path(:,2)=reference_path(:,2)*1000 +odometry(2);
 dlmwrite('test11corrected.txt', reference_path,'newline','pc');
 
-%{
-x = reference_path(:,1);
-y = reference_path(:,2);
-radius=100;
-for k1 = 1:length(x)
-    plot(x(k1),y(k1),'.');
-    c = [x(k1) y(k1)];
-    pos = [c-radius 2*radius 2*radius];
-    rectangle('Position',pos,'Curvature',[1 1])
-    axis equal
-    text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
-end
-%}
 
 for i=1:length(reference_path(:,1))
     ref = reference_path(i,1:2);
     disp(odometry)
     disp(ref)
     disp(norm(odometry(1:2)-ref))
+    bol = changeReference(i,ref,x_real,y_real);
+    if bol
+        continue
+    end
     
     while norm([x_real,y_real]-ref)>100
         nearby_doors = doors_in_range(doors,[x_real,y_real]);
@@ -100,19 +84,16 @@ for i=1:length(reference_path(:,1))
             pioneer_set_controls(sp,res(1)+50,res(2));
         else         
             theta_correction = adjustment(rangescan);
-            transposed_ref_list =[cos(theta_correction), -sin(theta_correction); sin(theta_correction), cos(theta_correction)].*transpose(reference_path(:,1:2));
-            reference_path(:,1:2) = transpose(transposed_ref_list);
-            disp(reference_path(1:7,1:2));
             if door_detected_front
-                distance_to_wall = detect_door_action(sp,2,lidar,distance_to_door);%front
+                distance_to_wall = detect_door_action(sp,2,lidar,distance_to_door,LD_result(4),theta_correction);%front
                 door_detected_front = false;
             elseif door_detected_right
-                distance_to_wall = detect_door_action(sp,1,lidar,distance_to_door);%right
+                distance_to_wall = detect_door_action(sp,1,lidar,distance_to_door,LD_result(4),theta_correction);%right
                 door_detected_right = false;
-               % distance_to_wall = LD_result(4);
-                fprintf("correction %d :",distance_to_wall - 835);       
+                %distance_to_wall = LD_result(4);
+                fprintf('correction %d :',distance_to_wall - 835);       
             elseif door_detected_left 
-                 distance_to_wall = detect_door_action(sp,0,lidar,distance_to_door);%left
+                 distance_to_wall = detect_door_action(sp,0,lidar,distance_to_door,LD_result(4),theta_correction);%left
                  door_detected_left = false;
                  %distance_to_wall = result(4);
             end
@@ -121,16 +102,12 @@ for i=1:length(reference_path(:,1))
            x_real = corrected_odom(1);
            y_real = corrected_odom(2);
            
-            % Check if we need to go to the next reference point. list numbers may be tuned
-            if i <= 12 && (x_real > ref(1))            
-                break
-            elseif i>12 && i <= 57 && y_real > ref(2)
-                break
-            elseif i >57 && i <= 87 && x_real  < ref(1)
-                break
-            elseif i > 87 && i <= 101 && y_real < ref(2)
-                break
-            end
+            % Check if we need to go to the next reference point. 
+            %list numbers MUST be tuned (and in correctOdometry)
+           bol = changeReference(i,ref,x_real,y_real);
+            if bol
+               break
+           end
         end
         
     end
@@ -161,8 +138,8 @@ function nearby_doors = doors_in_range(doors,odom)
 % to start searching for the door
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 %disp(odom)
-%start_coordinates  =[3600,2900]; % from lab mm
-start_coordinates = [6000,7125];% mm from hall
+start_coordinates  =[3600,2900]; % from lab mm
+%start_coordinates = [6000,7125];% mm from hall
 global door_index;
 odom_range_threshold = 1000; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error

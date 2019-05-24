@@ -1,6 +1,11 @@
 function res = control_system(ref,distance_to_wall,theta_correction,nr,theta_ref)
 %tuned parameters
+% sånn det er nå trenger vi ikke: ,distance_to_wall,theta_correction,nr,
 global odometry;
+global x_real;
+global y_real;
+global number
+nr = number;
 h = true;
 if h
     if nr > 43 
@@ -31,9 +36,11 @@ v_max=50;
 
 w_offset = 0;
 
-corrected_odom = correctOdometry(nr,distance_to_wall);
-x = corrected_odom(1);
-y = corrected_odom(2);
+%corrected_odom = correctOdometry(nr,distance_to_wall);
+%x = corrected_odom(1);
+%y = corrected_odom(2);
+x=x_real;
+y = y_real;
 if odometry(3)<= 2048
     theta = ((2*pi) / 4096) * odometry(3);
 else 
