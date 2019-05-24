@@ -1,4 +1,4 @@
-function res = control_system(ref,distance_to_wall,theta_correction,nr)
+function res = control_system(ref,distance_to_wall,theta_correction,nr,theta_ref)
 %tuned parameters
 global odometry;
 h = true;
@@ -51,7 +51,8 @@ end
 
 x_r = ref(1);
 y_r = ref(2);
-theta_r = atan2(y_r,x_r);
+theta_r = theta_ref(nr);
+%theta_r = atan2(y_r,x_r);
 
 
 %Error state in polar representation

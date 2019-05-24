@@ -36,6 +36,16 @@ y_real=odometry(2);
 reference_path(:,1)=reference_path(:,1)*1000+odometry(1);
 reference_path(:,2)=reference_path(:,2)*1000+odometry(2);
 
+% nytt
+x_ref = reference_path(:,1);
+y_ref = reference_path(:,2);
+
+theta_ref = zeros(1,length(x_ref));
+for h = 1:length(x_ref)-1
+    theta_ref(h) = atan2( (y_ref(h+1)- y_ref(h)), (x_ref(h+1)-x_ref(h)));
+end
+%slutt nytt
+
 x = reference_path(:,1);
 y = reference_path(:,2);
 radius=150;
@@ -48,13 +58,16 @@ for k1 = 1:length(x)
     text(x(k1) + 0.1,y(k1) + 0.1 ,num2str(k1),'Color','k')
 end
 
-for i=1:length(reference_path(:,1))
-    ref = reference_path(i,1:2);
+for h =1:length(reference_path(:,1))
+    ref = reference_path(h,1:2);
     disp(odometry)
     disp(ref)
     disp(norm(odometry(1:2)-ref))
-    
+    if changeReference(h,ref,x_real,y_real)
+        continue
+    end
     while norm([x_real,y_real]-ref)>150
+
         nearby_doors = doors_in_range(doors,[x_real,y_real]);
         if ~isempty(nearby_doors)
             disp('in nearby doors')
@@ -63,7 +76,7 @@ for i=1:length(reference_path(:,1))
         end
 
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
-            res = control_system(ref,distance_to_wall,theta_correction,i);
+            res = control_system(ref,distance_to_wall,theta_correction,h,theta_ref);
             x_real=res(3);
             y_real=res(4);
             pioneer_set_controls(sp,res(1)+70,res(2));
@@ -77,19 +90,20 @@ for i=1:length(reference_path(:,1))
                 distance_to_wall = input(prompt);
                 fprintf('correction %d :',distance_to_wall - 835); 
                 door_detected_right = false;
+                door_index = door_index +1;
             
-            corrected_odom = correctOdometry(i,distance_to_wall);
+            corrected_odom = correctOdometry(h,distance_to_wall);
             x_real = corrected_odom(1);
             y_real = corrected_odom(2);
            
             % Check if we need to go to the next reference point. list numbers may be tuned
-            if changeReference(i,ref,x_real,y_real)
+            if changeReference(h,ref,x_real,y_real)
                 break
             end
         end
         
     end
-    fprintf('POINT REACHED: %d', i)
+    fprintf('POINT REACHED: %d', h)
 end
 driveLab(sp,2);
 delete(odometrytmr);
@@ -115,16 +129,15 @@ function nearby_doors = doors_in_range(doors,odom)
 % to start searching for the door
 % OBS! Odometry errors will make this a problem after a while... tune threshold
 %disp(odom)
+global door_index;
 start_coordinates  =[3600,2600]; % from lab mm
 %start_coordinates = [6000,7125];% mm from hall
-global door_index;
-odom_range_threshold =600; % How far is odomotry from a existing door?
+odom_range_threshold = 600; % How far is odomotry from a existing door?
 nearby_doors=[]; % Initialize list to prevent error
-i=door_index; % must be incremented
-odom_range = norm([doors(i,1)-start_coordinates(1),doors(i,2)-start_coordinates(2)]-[odom(1),odom(2)]);
+odom_range = norm([doors(door_index,1)-start_coordinates(1),doors(door_index,2)-start_coordinates(2)]-[odom(1),odom(2)]);
 %odom
 %odom_range
-if odom_range < odom_range_threshold && doors(i,4)==0
-    nearby_doors=[nearby_doors;doors(i,:),i];
+if odom_range < odom_range_threshold && doors(door_index,4)==0
+    nearby_doors=[nearby_doors;doors(door_index,:),door_index];
 end
 end
