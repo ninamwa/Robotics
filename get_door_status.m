@@ -41,14 +41,17 @@ y=points(:,2);
 %plot(x,y);
 %hold on
 distance_to_wall = y(1);%y(length(y));
-%plot(x(1),y(1),'o');
+if door_index == 1
+    distance_to_wall = y(length(y));
+end
+%plot(x(length(y)),y(length(y)),'o');
 
 %plot(x(length(y)),y(length(y)),'o');
 
 %% Define thresholds
 open_threshold = distance_to_wall+1100; % bigger than
 closed_threshold = distance_to_wall+200; % less than
-closed_diff_threshold = 60; % threshold for difference between points in closed door
+closed_diff_threshold = 70; % threshold for difference between points in closed door
 search_range_door = 170; % not used
 % check x= [-search_range_door,0,search_range_door]
 %for thresholds
@@ -59,15 +62,15 @@ for i=1:length(x)
     if x(i)<-search_range_door
         before=y(i+1);
         %plot(x(i+1),before,'o');
-        hold on
+        %hold on
         break
     end
 end
 for i=1:length(x)
     if x(i)<search_range_door
         after=y(i-1); 
-       % plot(x(i-1),after,'*');
-        hold on
+        %plot(x(i-1),after,'*');
+       % hold on
         break
     end
 end
@@ -80,7 +83,7 @@ for i=1:length(x)
             middle_index=i-1;
             middle=y(middle_index);
         end
-       % plot(x(middle_index),middle,'*');
+        %plot(x(middle_index),middle,'*');
         break
     end
 end
