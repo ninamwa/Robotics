@@ -48,7 +48,7 @@ else
 end
 
 %theta = theta + theta_correction;
-fprintf('theta: %d', theta);
+%fprintf('theta: %d', theta);
 
 if theta>pi
     theta = theta-2*pi;
@@ -87,7 +87,7 @@ v = round(v);
 
 w = v_max*((1+K2*phi/alpha)*(tanh(K1*e)/e)*sin(alpha)+K3*tanh(alpha));
 w = round((w - w_offset)*(180/pi))  ;
-fprintf('w: %d, phi: %d, alpha: %d \n',w,phi,alpha);
+%fprintf('w: %d, phi: %d, alpha: %d \n',w,phi,alpha);
 
 if w > 50
     w = 20;

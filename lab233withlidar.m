@@ -100,11 +100,15 @@ for h =1:length(reference_path(:,1))
                 door_detected_right = false;
                 distance_to_wall = LD_result(4);
                 fprintf(2,' Distance to wall %d :\n',distance_to_wall);       
-                fprintf(2,' correction %d :\n',distance_to_wall - 835);       
+                fprintf(2,' correction %d :\n',distance_to_wall - 835);
+                fprintf(2,'door_index %d :\n', door_index -1);
             elseif door_detected_left 
                  detect_door_action(sp,0,lidar,distance_to_door);%left
                  door_detected_left = false;
                  distance_to_wall = LD_result(4);
+                fprintf(2,' Distance to wall %d :\n',distance_to_wall);       
+                fprintf(2,' correction %d :\n',distance_to_wall - 835);
+                fprintf(2,'door_index %d :\n', door_index -1);
             end
     
             if changeReference(h,ref,x_real,y_real)
