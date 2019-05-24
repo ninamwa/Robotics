@@ -17,11 +17,11 @@ elseif nr <= 20
     x = odometry(1) - correction;
     y = odometry(2) + last_correction_y;
     last_correction_x = correction;
-elseif nr <= 45
+elseif nr <= 27
     x = odometry(1) - last_correction_x;
     y = odometry(2) - correction;
     last_correction_y = correction;
-elseif nr <= 101 
+elseif nr <= 44 
     x = odometry(1) + correction;
     y = odometry(2) - last_correction_y;
 end
