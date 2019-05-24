@@ -85,6 +85,7 @@ for h =1:length(reference_path(:,1))
             if door_detected_left == true && door_index ==6
                 door_index = door_index +1;
                 door_detected_left = false;
+                door_detected_right = false;
             end
             
         end
@@ -93,7 +94,7 @@ for h =1:length(reference_path(:,1))
             res = control_system(ref,distance_to_wall,theta_correction,h,theta_ref);
             x_real=res(3);
             y_real=res(4);
-            pioneer_set_controls(sp,res(1)+100,res(2));
+            pioneer_set_controls(sp,res(1)+150,res(2));
         else
             pioneer_set_controls(sp,0,0);
             pioneer_set_controls(sp,100,0);
@@ -104,7 +105,7 @@ for h =1:length(reference_path(:,1))
             distance_to_wall = input(prompt);
             fprintf('correction %d :',distance_to_wall - 835);
             fprintf('door_index %d : ', door_index);
-            if door_index == 3
+            if door_index == 3 || door_index == 14
                 pioneer_set_controls(sp,0,45);
                 pause(2);
                 pioneer_set_controls(sp,0,0);
@@ -150,20 +151,20 @@ y_real = corrected(2);
 end
 
 function nearby_doors = doors_in_range(doors,odom)
-% For all doors in list, check if we are close enought, regarding odometry,
-% to start searching for the door
-% OBS! Odometry errors will make this a problem after a while... tune threshold
-%disp(odom)
-global door_index;
-start_coordinates  =[3600,2600]; % from lab mm
-%start_coordinates = [6000,7125];% mm from hall
-odom_range_threshold = 1000; % How far is odomotry from a existing door?
-nearby_doors=[]; % Initialize list to prevent error
-odom_range = norm([doors(door_index,1)-start_coordinates(1),doors(door_index,2)-start_coordinates(2)]-[odom(1),odom(2)]);
-%odom
-%odom_range
-if odom_range < odom_range_threshold && doors(door_index,4)==0
-    nearby_doors=[nearby_doors;doors(door_index,:),door_index];
-end
+    % For all doors in list, check if we are close enought, regarding odometry,
+    % to start searching for the door
+    % OBS! Odometry errors will make this a problem after a while... tune threshold
+    %disp(odom)
+    global door_index;
+    start_coordinates  =[3600,2600]; % from lab mm
+    %start_coordinates = [6000,7125];% mm from hall
+    odom_range_threshold = 1000; % How far is odomotry from a existing door?
+    nearby_doors=[]; % Initialize list to prevent error
+    odom_range = norm([doors(door_index,1)-start_coordinates(1),doors(door_index,2)-start_coordinates(2)]-[odom(1),odom(2)]);
+    %odom
+    %odom_range
+    if odom_range < odom_range_threshold && doors(door_index,4)==0
+        nearby_doors=[nearby_doors;doors(door_index,:),door_index];
+    end
 end
             
