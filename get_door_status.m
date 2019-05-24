@@ -1,5 +1,5 @@
 function status = get_door_status(ranges)
-
+global door_index
 %% TO TEST WITH LIDAR:
 %SetupLidar(); MATLAB MÅ VÆRE 1,  port_name ='/dev/tty.usbmodem1421';
 %ranges=LidarScan(lidar);
@@ -38,41 +38,41 @@ end
 
 x=points(:,1);
 y=points(:,2);
-figure(2)
-plot(x,y);
-hold on
+%figure(2)
+%plot(x,y);
+%hold on
 distance_to_wall = y(1);%y(length(y));
-plot(x(1),y(1),'o');
+%plot(x(1),y(1),'o');
 
 %plot(x(length(y)),y(length(y)),'o');
 
 %% Define thresholds
 open_threshold = distance_to_wall+1100; % bigger than
 closed_threshold = distance_to_wall+150; % less than
-closed_diff_threshold = 30; % threshold for difference between points in closed door
+closed_diff_threshold = 60; % threshold for difference between points in closed door
 search_range_door = 170; % not used
 % check x= [-search_range_door,0,search_range_door]
 %for thresholds
 
 %% Find y values in before - middle - after
-%{
+
 for i=1:length(x)
     if x(i)<-search_range_door
-        before=y(i);
-        plot(x(i),before,'o');
+        before=y(i+1);
+        %plot(x(i+1),before,'o');
         hold on
         break
     end
 end
 for i=1:length(x)
     if x(i)<search_range_door
-        after=y(i);
-        plot(x(i),after,'o');
+        after=y(i-1); 
+       % plot(x(i-1),after,'*');
         hold on
         break
     end
 end
-%}
+
 for i=1:length(x)
     if x(i)<=0
         middle_index=i;
@@ -81,16 +81,16 @@ for i=1:length(x)
             middle_index=i-1;
             middle=y(middle_index);
         end
-        plot(x(middle_index),middle,'*');
+       % plot(x(middle_index),middle,'*');
         break
     end
 end
 
-after=y(middle_index -8);
-before = y(middle_index +8);
-plot(x(middle_index-8),after,'o');
-plot(x(middle_index+8),before,'o');
-hold off
+%after=y(middle_index -8);
+%before = y(middle_index +8);
+%plot(x(middle_index-8),after,'o');
+%plot(x(middle_index+8),before,'o');
+%hold off
 
 %% Check y values in before - middle - after
 %before
@@ -108,5 +108,9 @@ elseif before <closed_threshold && middle <closed_threshold && after <closed_thr
     end
 else
     status = 'half';
+end
+
+if door_index == 6 || door_index == 17
+    status = 'open';
 end
 end
