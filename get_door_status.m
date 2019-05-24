@@ -1,9 +1,5 @@
 function status = get_door_status(ranges)
 global door_index
-%% TO TEST WITH LIDAR:
-%SetupLidar(); MATLAB MÅ VÆRE 1,  port_name ='/dev/tty.usbmodem1421';
-%ranges=LidarScan(lidar);
-
 %% TO TEST WITH RANGES FILES:
 %halfopendoor.txt
 %opendoor.txt
@@ -93,12 +89,7 @@ end
 %hold off
 
 %% Check y values in before - middle - after
-%before
-%middle
-%after
-%sqrt((before-after)^2)
-%sqrt((middle-after)^2)
-%sqrt((before-middle)^2)
+
 if  middle > open_threshold && after >open_threshold % before > open_threshold &&
     status = 'open';
 elseif before <closed_threshold && middle <closed_threshold && after <closed_threshold

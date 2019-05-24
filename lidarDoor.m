@@ -1,13 +1,8 @@
 function door_bol = lidarDoor(nearby_doors,ranges)  %input: ranges
-% Odometry in mm
 
-% Start_coordinates in mm, worldcoordinates
 
-% doors: x,y, 0:RIGHT/1:LEFT/2:FRONT, 0:NOTFOUND/1:FOUND/, indexl
+% doors: x,y, 0:RIGHT/1:LEFT/2:FRONT
 
-%% TODO: (problem) for halvåpen dør kommer max(norm) til å si at max er der 
-%døren går uendelig innover, og ikke dørkarm, som kommer til å gi feil
-%dør start.
 x= [];
 y=[];
 distance_to_wall = 0;
@@ -28,7 +23,7 @@ points=[x,y];
 leftpoints = [];
 rightpoints = [];
 for q = 1:length(x)
-    if points(q,1)<0 && points(q,2)<2000  % ønsker ikke å kutte liste mer, for out of range problem i løkke
+    if points(q,1)<0 && points(q,2)<2000  
         leftpoints= [points(q,:);leftpoints];
     end
     if points(q,1)>0 && points(q,2)<2000
@@ -37,9 +32,9 @@ for q = 1:length(x)
 end
 
 %% Set thresholds and parameters
-door_threshold = 60; %60? think 70 is too big. How big norm represents a door?
+door_threshold = 60; % How big norm represents a door?
 search_range = 1500; % 1000? How far ahead should we look for doors?
-door_distance = 500; %2 is probably to small. How close should the robot be to the door before is it denoted as detected?
+door_distance = 500; % How close should the robot be to the door before is it denoted as detected?
 door_distance_front = 1500;
 detect_door_left = false; % results
 detect_door_right = false; % results
@@ -84,13 +79,12 @@ if ~isempty(nearby_door_right)% Right door
     end
     % If the distance to the door is less than door_distance, we
     % want a DOOR event to occur, and list the door as detected
-    if  norm(right_door(2)) < door_distance % && norm(right_door(2))>0
+    if  norm(right_door(2)) < door_distance 
         distance_to_wall = rightpoints(n,1);
         distance_to_door = rightpoints(n,2);
         R_index = n; % used for plotting
-        %doors(nearby_door_right(5),4)=1; 
         detect_door_right = true; % SET GLOBAL RIGHT DOOR TO TRUE
-        %set_door_detected(nearby_door_right(5))% SET DOOR TO FOUND
+        
     end
 end
 
@@ -108,7 +102,7 @@ if ~isempty(nearby_door_left)%  If left door
               end
         end
     end
-    if norm(left_door(2))<door_distance % && norm(left_door(2))>0
+    if norm(left_door(2))<door_distance 
         distance_to_wall = 1670 + leftpoints(n,1);
         leftpoints(n,1)
         %if distance_to_wall == 0
@@ -116,9 +110,9 @@ if ~isempty(nearby_door_left)%  If left door
         %end
         distance_to_door = leftpoints(n,2);
         L_index = n;
-        % doors(nearby_door_left(5),4)=1; SET DOOR TO FOUND
+        
         detect_door_left = true; % SET GLOBAL LEFT DOOR TO TRUE
-        %set_door_detected(nearby_door_left(5)); % SET DOOR TO FOUND
+  
     end
 end
 if ~isempty(nearby_door_front)
