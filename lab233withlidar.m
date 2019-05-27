@@ -73,13 +73,19 @@ for h =1:length(reference_path(:,1))
             door_detected_front = LD_result(3);
             disp(door_detected_right);
             distance_to_door = LD_result(5);
+            
+            if door_detected_left == true && door_index ==6
+                door_index = door_index +1;
+                door_detected_left = false;
+            end
+            
         end
 
         if ~door_detected_right && ~door_detected_left && ~door_detected_front
             res = control_system(ref,distance_to_wall,theta_correction,h,theta_ref);
             x_real=res(3);
             y_real=res(4);
-            pioneer_set_controls(sp,res(1)+70,res(2));
+            pioneer_set_controls(sp,res(1)+100,res(2));
         else
             %theta_correction = adjustment(rangescan)*180/pi - 90;
             %detect_door_action(sp,2,lidar,distance_to_door,theta_correction)
@@ -94,11 +100,15 @@ for h =1:length(reference_path(:,1))
                 door_detected_right = false;
                 distance_to_wall = LD_result(4);
                 fprintf(2,' Distance to wall %d :\n',distance_to_wall);       
-                fprintf(2,' correction %d :\n',distance_to_wall - 835);       
+                fprintf(2,' correction %d :\n',distance_to_wall - 835);
+                fprintf(2,'door_index %d :\n', door_index -1);
             elseif door_detected_left 
                  detect_door_action(sp,0,lidar,distance_to_door);%left
                  door_detected_left = false;
                  distance_to_wall = LD_result(4);
+                fprintf(2,' Distance to wall %d :\n',distance_to_wall);       
+                fprintf(2,' correction %d :\n',distance_to_wall - 835);
+                fprintf(2,'door_index %d :\n', door_index -1);
             end
     
             if changeReference(h,ref,x_real,y_real)

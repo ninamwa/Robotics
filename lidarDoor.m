@@ -103,7 +103,9 @@ if ~isempty(nearby_door_left)%  If left door
         end
     end
     if norm(left_door(2))<door_distance 
-        distance_to_wall = 1670 + leftpoints(n,1);
+        if distance_to_wall == 0
+            distance_to_wall = 835; %1670 + leftpoints(n,1);
+        end
         leftpoints(n,1)
         %if distance_to_wall == 0
         %    distance_to_wall = 835;
