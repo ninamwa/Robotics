@@ -1,10 +1,10 @@
 function playSound(status) 
     if strcmp(status,'open')
-        filename='applauce.wav';
+        filename='opendoor.wav';
     elseif strcmp(status, 'half')
-        filename='door_knob.wav';
+        filename='halfopen.wav';
     elseif strcmp(status, 'closed')
-        filename='maybe-next-time.wav';
+        filename='doorclosed.wav';
     end
     [y,Fs] = audioread(filename);
     sound(y,Fs);
