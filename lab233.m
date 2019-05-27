@@ -11,9 +11,11 @@ global number
 door_index = 1;
 number = 1;
 distance_to_wall = 0;
-x_real=odometry(1);
-y_real=odometry(2);
+global corr_y;
+global corr_x;
 
+corr_y = 0;
+corr_x = 0;
 
 odometrytmr = timer('ExecutionMode', 'FixedRate', ...
     'Period', 0.1, ...
@@ -21,7 +23,8 @@ odometrytmr = timer('ExecutionMode', 'FixedRate', ...
     'TimerFcn', {@odometrytimerCallback});
 
 start(odometrytmr);
-
+x_real=odometry(1);
+y_real=odometry(2);
 
 door_detected_right = false;
 door_detected_left = false;
@@ -76,13 +79,13 @@ for h =1:length(reference_path(:,1))
                 door_detected_left = true;
                 nearby_doors = [];
             else
-                door_index = door_index +1;
+                door_detected_front = true;
                 nearby_doors = [];
             end
             %disp(door_detected_right);
             %distance_to_door = LD_result(5);
             
-            if door_detected_left == true && door_index ==6
+            if  door_index ==6
                 door_index = door_index +1;
                 door_detected_left = false;
                 door_detected_right = false;
@@ -99,17 +102,30 @@ for h =1:length(reference_path(:,1))
             pioneer_set_controls(sp,0,0);
             pioneer_set_controls(sp,100,0);
             pause(5);
-            if door_index == 3 || door_index == 14
-                pause(9);
+            if door_index == 3 || door_index == 15
+                pause(3);
+            elseif door_index == 10 
+                disp("DOOR10")
+                pause(8);
+                pioneer_set_controls(sp,0,0);
             end
             
             pioneer_set_controls(sp,0,0);
      
             prompt = 'What is the distance to the wall? ';
             distance_to_wall = input(prompt);
+            if h <= 12
+                corr_y = corr_y + (distance_to_wall-835);
+            elseif h <= 21
+                corr_x= corr_x + (distance_to_wall-835);
+            elseif h <= 29
+                corr_y = corr_y + (distance_to_wall-835);
+            elseif h <= 45
+                corr_x = corr_x + (distance_to_wall-835);
+            end
             fprintf('correction %d :',distance_to_wall - 835);
             fprintf('door_index %d : ', door_index);
-            if door_index == 3 || door_index == 14
+            if door_index == 3 || door_index == 10 || door_index == 15
                 pioneer_set_controls(sp,0,45);
                 pause(2);
                 pioneer_set_controls(sp,0,0);
@@ -117,6 +133,7 @@ for h =1:length(reference_path(:,1))
             
             door_detected_right = false;
             door_detected_left = false;
+            door_detected_front = false;
             
             door_index = door_index +1;
             
@@ -159,16 +176,19 @@ function nearby_doors = doors_in_range(doors,odom)
     % to start searching for the door
     % OBS! Odometry errors will make this a problem after a while... tune threshold
     %disp(odom)
+    nearby_doors = [];
     global door_index;
-    start_coordinates  =[3600,2600]; % from lab mm
-    %start_coordinates = [6000,7125];% mm from hall
-    odom_range_threshold = 600; % How far is odomotry from a existing door?
-    nearby_doors=[]; % Initialize list to prevent error
-    odom_range = norm([doors(door_index,1)-start_coordinates(1),doors(door_index,2)-start_coordinates(2)]-[odom(1),odom(2)]);
-    %odom
-    %odom_range
-    if odom_range < odom_range_threshold && doors(door_index,4)==0
-        nearby_doors=[nearby_doors;doors(door_index,:),door_index];
+    if door_index <=20
+        start_coordinates  =[3600,2600]; % from lab mm
+        %start_coordinates = [6000,7125];% mm from hall
+        odom_range_threshold = 800; % How far is odomotry from a existing door?
+        nearby_doors=[]; % Initialize list to prevent error
+        odom_range = norm([doors(door_index,1)-start_coordinates(1),doors(door_index,2)-start_coordinates(2)]-[odom(1),odom(2)]);
+        %odom
+        %odom_range
+        if odom_range < odom_range_threshold && doors(door_index,4)==0
+            nearby_doors=[nearby_doors;doors(door_index,:),door_index];
+        end
     end
 end
             

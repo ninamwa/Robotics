@@ -30,7 +30,7 @@ StopPoints = [
     
     Waypoints = [x,y];
 
-%dlmwrite('PerfectPathHall.txt', Waypoints,'newline','pc');
+dlmwrite('PerfectPathHall.txt', Waypoints,'newline','pc');
 
 StopPoints = [2,3
             4.5, 3

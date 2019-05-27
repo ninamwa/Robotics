@@ -1,5 +1,5 @@
 function testPlot()
-reference_path = dlmread('test11.txt');
+reference_path = dlmread('test000.txt');
 
 figure(1);
 clf
