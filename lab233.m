@@ -119,9 +119,9 @@ for h =1:length(reference_path(:,1))
             elseif h <= 21
                 corr_x= corr_x + (distance_to_wall-835);
             elseif h <= 29
-                corr_y = corr_y + (distance_to_wall-835);
+                corr_y = corr_y - (distance_to_wall-835);
             elseif h <= 45
-                corr_x = corr_x + (distance_to_wall-835);
+                corr_x = corr_x - (distance_to_wall-835);
             end
             fprintf('correction %d :',distance_to_wall - 835);
             fprintf('door_index %d : ', door_index);

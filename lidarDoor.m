@@ -15,7 +15,6 @@ for n = 1:length(ranges)
         x=[x; xn];
         y=[y; yn];
     end
-
 end
 points=[x,y];
 
@@ -33,7 +32,7 @@ end
 
 %% Set thresholds and parameters
 door_threshold = 60; % How big norm represents a door?
-search_range = 1500; % 1000? How far ahead should we look for doors?
+search_range = 700; % 1000? How far ahead should we look for doors?
 door_distance = 500; % How close should the robot be to the door before is it denoted as detected?
 door_distance_front = 1500;
 detect_door_left = false; % results
@@ -104,13 +103,13 @@ if ~isempty(nearby_door_left)%  If left door
     end
     if norm(left_door(2))<door_distance 
         if distance_to_wall == 0
-            distance_to_wall = 835; %1670 + leftpoints(n,1);
+            distance_to_wall= 1670 + leftpoints(n,1);
         end
         leftpoints(n,1)
-        %if distance_to_wall == 0
-        %    distance_to_wall = 835;
-        %end
-        distance_to_door = leftpoints(n,2);
+        if distance_to_wall == 0
+            distance_to_wall = 835;
+        end
+        %distance_to_door = leftpoints(n,2);
         L_index = n;
         
         detect_door_left = true; % SET GLOBAL LEFT DOOR TO TRUE

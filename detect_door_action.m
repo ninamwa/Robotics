@@ -2,20 +2,20 @@
 function detect_door_action(sp,LeftRightFront,lidar,distance_to_door)%L:0,R:1,F:2global door_index
 global door_index
 pause_turning = 2;
-pause_drive_forward = distance_to_door/50 + 10;
+pause_drive_forward = 5;%distance_to_door/50 + 8;
 if door_index == 1
-    pause_drive_forward = pause_drive_forward + 10;
+    pause_drive_forward = pause_drive_forward + 6;
 end
-if door_index == 3
-    pause_drive_forward = pause_drive_forward + 2;
+if door_index == 3 || door_index == 15
+    pause_drive_forward = pause_drive_forward+ 1;
 end
 if door_index == 10
-    pause_drive_forward = distance_to_door/50;
+    pause_drive_forward = 12;
 end
 
 
 if LeftRightFront == 2  %FRONT
-    pioneer_set_controls(sp,50,0);
+    pioneer_set_controls(sp,100,0);
     pause(pause_drive_forward)
     pioneer_set_controls(sp,0,0);
     pause(1);
@@ -32,14 +32,14 @@ if LeftRightFront == 2  %FRONT
     door_index = door_index+1;    
 elseif LeftRightFront ==0 || LeftRightFront ==1
     
-        pioneer_set_controls(sp,50,0);
-        pause(pause_drive_forward);
-        pioneer_set_controls(sp,0,0);
+    pioneer_set_controls(sp,100,0);
+    pause(pause_drive_forward);
+    pioneer_set_controls(sp,0,0);
     
     if LeftRightFront == 1 %right
         first_turn = -45;
         second_turn = 45;
-        if door_index == 3 || door_index==14
+        if door_index == 3 || door_index==15
             second_turn =90; % 180 degrees, for doors in corner 1 and 3
         end
     elseif LeftRightFront ==0 %left
@@ -76,6 +76,7 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
         status = get_door_status(rangescan);
         playSound(status);
         pause(3);
+        door_index = door_index + 1;
         % Turn 90degrees
         pioneer_set_controls(sp,0,second_turn);
         pause(pause_turning)

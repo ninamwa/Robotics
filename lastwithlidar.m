@@ -13,10 +13,9 @@ number = 1;
 distance_to_wall = 0;
 global corr_y;
 global corr_x;
-SetupLidar();
-
 corr_y = 0;
 corr_x = 0;
+SetupLidar();
 
 odometrytmr = timer('ExecutionMode', 'FixedRate', ...
     'Period', 0.1, ...
@@ -41,7 +40,6 @@ reference_path(:,1)=reference_path(:,1)*1000+odometry(1);
 reference_path(:,2)=reference_path(:,2)*1000+odometry(2);
 dlmwrite('test11corrected.txt', reference_path,'newline','pc');
 
-% nytt
 x_ref = reference_path(:,1);
 y_ref = reference_path(:,2);
 
@@ -49,11 +47,6 @@ theta_ref = zeros(1,length(x_ref));
 for h = 1:length(x_ref)-1
     theta_ref(h) = atan2( (y_ref(h+1)- y_ref(h)), (x_ref(h+1)-x_ref(h)));
 end
-%slutt nytt
-
-x = reference_path(:,1);
-y = reference_path(:,2);
-
 
 for h =1:length(reference_path(:,1))
     number = h;
@@ -75,14 +68,10 @@ for h =1:length(reference_path(:,1))
             door_detected_left = LD_result(1);
             door_detected_right = LD_result(2);
             door_detected_front = LD_result(3);
-            %RLF = doors(door_index,3);
-            %disp(door_detected_right);
             distance_to_door = LD_result(5);
-            
-            if  door_index ==6
-                door_index = door_index +1;
+            if door_index == 12
                 door_detected_left = false;
-                %door_detected_right = false;
+                door_index = door_index+1;
             end
             
         end
@@ -93,21 +82,18 @@ for h =1:length(reference_path(:,1))
             y_real=res(4);
             pioneer_set_controls(sp,res(1)+150,res(2));
         else
-            %prompt = 'What is the distance to the wall? ';
-            %distance_to_wall = input(prompt);
-
-            %theta_correction = adjustment(rangescan)*180/pi - 90;
-            %detect_door_action(sp,2,lidar,distance_to_door,theta_correction)
-            %i detect door action, ta inn vinkel
-            % first_turn = 90 + theta_correction
-            
             if door_detected_front
                 detect_door_action(sp,2,lidar,distance_to_door);%front
                 door_detected_front = false;
+                distance_to_wall = LD_result(4);
+                fprintf(2,' Distance to wall %d :\n',distance_to_wall);
+                fprintf(2,' correction %d :\n',distance_to_wall - 835);
+                 fprintf(2,'door_index %d :\n', door_index -1);
             elseif door_detected_right
+                distance_to_wall = LD_result(4);
                 detect_door_action(sp,1,lidar,distance_to_door);%right
                 door_detected_right = false;
-                distance_to_wall = LD_result(4);
+                door_detected_left = false;
                 fprintf(2,' Distance to wall %d :\n',distance_to_wall);
                 fprintf(2,' correction %d :\n',distance_to_wall - 835);
                 fprintf(2,'door_index %d :\n', door_index -1);
@@ -118,6 +104,11 @@ for h =1:length(reference_path(:,1))
                 fprintf(2,' Distance to wall %d :\n',distance_to_wall);
                 fprintf(2,' correction %d :\n',distance_to_wall - 835);
                 fprintf(2,'door_index %d :\n', door_index -1);
+            end
+            if distance_to_wall < 250 
+                distance_to_wall = 350;
+            elseif distance_to_wall > 1400
+                distance_to_wall = 1300;
             end
             if h <= 12
                 corr_y = corr_y + (distance_to_wall-835);
@@ -137,9 +128,9 @@ for h =1:length(reference_path(:,1))
     fprintf('POINT REACHED: %d', h)
 end
 driveLab(sp,2);
-delete(odometrytmr);
-pioneer_close(sp);
-serial_port_stop(sp);
+%delete(odometrytmr);
+%pioneer_close(sp);
+%serial_port_stop(sp);
 end
 
 
@@ -172,11 +163,9 @@ function nearby_doors = doors_in_range(doors,odom)
     if door_index <=20
         start_coordinates  =[3600,2600]; % from lab mm
         %start_coordinates = [6000,7125];% mm from hall
-        odom_range_threshold = 800; % How far is odomotry from a existing door?
+        odom_range_threshold = 1000; % How far is odomotry from a existing door?
         nearby_doors=[]; % Initialize list to prevent error
         odom_range = norm([doors(door_index,1)-start_coordinates(1),doors(door_index,2)-start_coordinates(2)]-[odom(1),odom(2)]);
-        %odom
-        %odom_range
         if odom_range < odom_range_threshold && doors(door_index,4)==0
             nearby_doors=[nearby_doors;doors(door_index,:),door_index];
         end

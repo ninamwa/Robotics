@@ -23,11 +23,11 @@ end
 %drive into lab
 if type==2
     pioneer_set_controls(sp,100,0);
-    pause(4.2);
+    pause(40);
     pioneer_set_controls(sp,0,-45);
     pause(2);
     pioneer_set_controls(sp,100,0);
-    pause(2.85);
+    pause(28.5);
     pioneer_set_controls(sp,0,0); 
 end
 

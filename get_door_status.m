@@ -5,7 +5,7 @@ global door_index
 %opendoor.txt
 %closeddoor.txt
 %ranges = dlmread('halfopendoor2.txt');
-status= 'half';
+status= 'closed';
 middle = 0;
 after = 0;
 before = 0;
@@ -52,7 +52,7 @@ end
 open_threshold = distance_to_wall+1100; % bigger than
 closed_threshold = distance_to_wall+200; % less than
 closed_diff_threshold = 70; % threshold for difference between points in closed door
-search_range_door = 170; % not used
+search_range_door = 150;
 % check x= [-search_range_door,0,search_range_door]
 %for thresholds
 
