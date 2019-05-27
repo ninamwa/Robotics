@@ -99,6 +99,10 @@ for h =1:length(reference_path(:,1))
             pioneer_set_controls(sp,0,0);
             pioneer_set_controls(sp,100,0);
             pause(5);
+            if door_index == 3 || door_index == 14
+                pause(9);
+            end
+            
             pioneer_set_controls(sp,0,0);
      
             prompt = 'What is the distance to the wall? ';
@@ -158,7 +162,7 @@ function nearby_doors = doors_in_range(doors,odom)
     global door_index;
     start_coordinates  =[3600,2600]; % from lab mm
     %start_coordinates = [6000,7125];% mm from hall
-    odom_range_threshold = 1000; % How far is odomotry from a existing door?
+    odom_range_threshold = 600; % How far is odomotry from a existing door?
     nearby_doors=[]; % Initialize list to prevent error
     odom_range = norm([doors(door_index,1)-start_coordinates(1),doors(door_index,2)-start_coordinates(2)]-[odom(1),odom(2)]);
     %odom
