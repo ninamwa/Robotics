@@ -16,7 +16,10 @@ end
 
 if LeftRightFront == 2  %FRONT
     pioneer_set_controls(sp,100,0);
+    pioneer_set_controls(sp,100,0);
+
     pause(pause_drive_forward)
+    pioneer_set_controls(sp,0,0);
     pioneer_set_controls(sp,0,0);
     pause(1);
     rangescan = LidarScan(lidar);
@@ -26,15 +29,21 @@ if LeftRightFront == 2  %FRONT
     playSound(status);
     pause(3);
     pioneer_set_controls(sp,0,45);
+    pioneer_set_controls(sp,0,45);
+
     pause(pause_turning);
     pioneer_set_controls(sp,0,0);
+    pioneer_set_controls(sp,0,0);
+
     pause(1);
     door_index = door_index+1;    
 elseif LeftRightFront ==0 || LeftRightFront ==1
-    
+    pioneer_set_controls(sp,100,0);
     pioneer_set_controls(sp,100,0);
     pause(pause_drive_forward);
     pioneer_set_controls(sp,0,0);
+    pioneer_set_controls(sp,0,0);
+
     
     if LeftRightFront == 1 %right
         first_turn = -45;
@@ -48,8 +57,12 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
     end
     %Turn 90 degrees
     pioneer_set_controls(sp,0,first_turn);
+    pioneer_set_controls(sp,0,first_turn);
+
     pause(pause_turning)
     pioneer_set_controls(sp,0,0);
+    pioneer_set_controls(sp,0,0);
+
     pause(1)
     rangescan = LidarScan(lidar);
     pause(1)
@@ -59,16 +72,27 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
     pause(3);
     % Turn 90degrees
     pioneer_set_controls(sp,0,second_turn);
+    pioneer_set_controls(sp,0,second_turn);
+
     pause(pause_turning)
+    
     pioneer_set_controls(sp,0,0);
+    pioneer_set_controls(sp,0,0);
+
     pause(1)
     door_index = door_index+1;
     if door_index == 6
         first_turn = 45;
         second_turn = -45;
+        
         pioneer_set_controls(sp,0,first_turn);
+        pioneer_set_controls(sp,0,first_turn);
+
         pause(pause_turning)
+        
         pioneer_set_controls(sp,0,0);
+        pioneer_set_controls(sp,0,0);
+
         pause(1)
         rangescan = LidarScan(lidar);
         pause(1)
@@ -77,10 +101,16 @@ elseif LeftRightFront ==0 || LeftRightFront ==1
         playSound(status);
         pause(3);
         door_index = door_index + 1;
+        
         % Turn 90degrees
         pioneer_set_controls(sp,0,second_turn);
+        pioneer_set_controls(sp,0,second_turn);
+
         pause(pause_turning)
+        
         pioneer_set_controls(sp,0,0);
+        pioneer_set_controls(sp,0,0);
+
         pause(1)
     end
 end

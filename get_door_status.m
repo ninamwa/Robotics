@@ -61,16 +61,18 @@ search_range_door = 150;
 for i=1:length(x)
     if x(i)<-search_range_door
         before=y(i+1);
-        %plot(x(i+1),before,'o');
-        %hold on
+        before = (y(i-1) + y(i) + y(i+1) + y(i+2) + y(i+3) )/5;
+        plot(x(i+1),before,'o');
+        hold on
         break
     end
 end
 for i=1:length(x)
     if x(i)<search_range_door
-        after=y(i-1); 
-        %plot(x(i-1),after,'*');
-       % hold on
+        after = y(i-1); 
+        after =( y(i-2) + y(i-1) + y(i) + y(i+1) + y(i+2))/5;
+        plot(x(i-1),after,'*');
+        hold on
         break
     end
 end
@@ -82,12 +84,14 @@ for i=1:length(x)
         if x(i)<0
             middle_index=i-1;
             middle=y(middle_index);
+            
         end
-        %plot(x(middle_index),middle,'*');
+        middle = (y(middle_index-2) + y(middle_index-1) + y(middle_index) + y(middle_index+1)+y(middle_index+2))/5;
+        plot(x(middle_index),middle,'o');
+        hold on
         break
     end
 end
-
 %after=y(middle_index -8);
 %before = y(middle_index +8);
 %plot(x(middle_index-8),after,'o');
