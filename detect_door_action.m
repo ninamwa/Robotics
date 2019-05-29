@@ -6,7 +6,7 @@ pause_drive_forward = 5;%distance_to_door/50 + 8;
 if door_index == 1
     pause_drive_forward = pause_drive_forward + 6;
 end
-if door_index == 3 || door_index == 15
+if door_index == 3 
     pause_drive_forward = pause_drive_forward+ 1;
 end
 if door_index == 10

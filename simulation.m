@@ -1,7 +1,5 @@
 clear all
 h = 0.01;
-%sp = serial_port_start();
-%pioneer_init(sp);
 
 button = 1;
 k=1;
@@ -74,8 +72,6 @@ for k1 = 1:100:length(x),
         w(k) = v_max*((1+K2*phi(k)/alpha(k))*(tanh(K1*e(k))/e(k))*sin(alpha(k))+K3*tanh(alpha(k)));
         t = round(w(k)*180/pi);
         fprintf('v: %d, w: %d\n', v(k),t)
-        %pioneer_set_controls(sp,v(k),x);
-        
         
         q(k+1,1) = q(k,1) + h*cos(theta)*v(k);
         q(k+1,2) = q(k,2) + h*sin(theta)*v(k);
