@@ -34,14 +34,14 @@ door_detected_left = false;
 door_detected_front = false;
 theta_correction=0;
 
-doors = dlmread('Doors_edit.txt');
-reference_path = dlmread('test11.txt');
+doors = dlmread('Doors.txt');
+reference_path = dlmread('5thfloor_path.txt');
 
 driveLab(sp,1);
 
 reference_path(:,1)=reference_path(:,1)*1000+odometry(1);
 reference_path(:,2)=reference_path(:,2)*1000+odometry(2);
-dlmwrite('test11corrected.txt', reference_path,'newline','pc');
+%dlmwrite('test11corrected.txt', reference_path,'newline','pc');
 
 x_ref = reference_path(:,1);
 y_ref = reference_path(:,2);
@@ -164,9 +164,8 @@ y_real = corrected(2);
 end
 
 function nearby_doors = doors_in_range(doors,odom)
-    % For all doors in list, check if we are close enought, regarding odometry,
+    % For all doors in list, check if we are close enought, regarding real odometry,
     % to start searching for the door
-    
     nearby_doors = [];
     global door_index;
     if door_index <=20
@@ -174,7 +173,7 @@ function nearby_doors = doors_in_range(doors,odom)
         odom_range_threshold = 1000; % How far is odomotry from a existing door?
         nearby_doors=[]; % Initialize list to prevent error
         odom_range = norm([doors(door_index,1)-start_coordinates(1),doors(door_index,2)-start_coordinates(2)]-[odom(1),odom(2)]);
-        if odom_range < odom_range_threshold && doors(door_index,4)==0
+        if odom_range < odom_range_threshold 
             nearby_doors=[nearby_doors;doors(door_index,:),door_index];
         end
     end

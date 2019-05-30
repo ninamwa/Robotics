@@ -1,11 +1,6 @@
 function status = get_door_status(ranges)
 global door_index
-%% TO TEST WITH RANGES FILES:
-%halfopendoor.txt
-%opendoor.txt
-%closeddoor.txt
-%ranges = dlmread('halfopendoor2.txt');
-status= 'closed';
+status= 'half'; % initialize
 middle = 0;
 after = 0;
 before = 0;
@@ -37,16 +32,11 @@ end
 
 x=points(:,1);
 y=points(:,2);
-%figure(2)
-%plot(x,y);
-%hold on
-distance_to_wall = y(1);%y(length(y));
-if door_index == 1
-    distance_to_wall = y(length(y));
-end
-%plot(x(length(y)),y(length(y)),'o');
 
-%plot(x(length(y)),y(length(y)),'o');
+distance_to_wall = y(1); % rightermost point
+if door_index == 1
+    distance_to_wall = y(length(y)); % use left point instead, double door
+end
 
 %% Define thresholds
 open_threshold = distance_to_wall+1100; % bigger than
@@ -62,8 +52,6 @@ for i=1:length(x)
     if x(i)<-search_range_door
         before=y(i+1);
         before = (y(i-1) + y(i) + y(i+1) + y(i+2) + y(i+3) )/5;
-        %plot(x(i+1),before,'o');
-        %hold on
         break
     end
 end
@@ -71,8 +59,6 @@ for i=1:length(x)
     if x(i)<search_range_door
         after = y(i-1); 
         after =( y(i-2) + y(i-1) + y(i) + y(i+1) + y(i+2))/5;
-        %plot(x(i-1),after,'*');
-        %hold on
         break
     end
 end
@@ -87,16 +73,9 @@ for i=1:length(x)
             
         end
         middle = (y(middle_index-2) + y(middle_index-1) + y(middle_index) + y(middle_index+1)+y(middle_index+2))/5;
-        %plot(x(middle_index),middle,'o');
-        %hold on
         break
     end
 end
-%after=y(middle_index -8);
-%before = y(middle_index +8);
-%plot(x(middle_index-8),after,'o');
-%plot(x(middle_index+8),before,'o');
-%hold off
 
 %% Check y values in before - middle - after
 
@@ -111,7 +90,4 @@ else
     status = 'half';
 end
 
-if door_index == 6 || door_index == 17
-    status = 'open';
-end
 end

@@ -1,13 +1,12 @@
 function door_bol = lidarDoor(nearby_doors,ranges)  %input: ranges
 
-
 % doors: x,y, 0:RIGHT/1:LEFT/2:FRONT
 
 x= [];
 y=[];
 distance_to_wall = 0;
 distance_to_door = 0;
-lidar_error_range = 20; % can be tuned
+lidar_error_range = 20; % noise. can be tuned
 for n = 1:length(ranges)
     if ranges(n)> lidar_error_range
         xn = cosd(-30+ (n-1)*(240/682)) *ranges(n);
@@ -38,9 +37,7 @@ door_distance_front = 1500;
 detect_door_left = false; % results
 detect_door_right = false; % results
 detect_door_front = false; % results
-L_index = 0; % only used for plotting
-R_index = 0; % only used for plotting
-F_index = 0; % only used for plotting
+
 nearby_door_left=[];
 nearby_door_right=[];
 nearby_door_front=[];
@@ -69,7 +66,6 @@ if ~isempty(nearby_door_right)% Right door
             norm_right(n) = norm(rightpoints(n,:)-rightpoints(n+2,:));
             % If the norm is over a threshold, this would be a door
             if norm_right(n) > door_threshold     % Find first maxnorm on rightwall
-                Y = norm_right(n);
                 % Save start position of door
                 right_door = [rightpoints(n,1),rightpoints(n,2)];
                 break
@@ -80,9 +76,8 @@ if ~isempty(nearby_door_right)% Right door
     % want a DOOR event to occur, and list the door as detected
     if  norm(right_door(2)) < door_distance 
         distance_to_wall = rightpoints(n,1);
-        distance_to_door = rightpoints(n,2);
-        R_index = n; % used for plotting
-        detect_door_right = true; % SET GLOBAL RIGHT DOOR TO TRUE
+        %distance_to_door = rightpoints(n,2);
+        detect_door_right = true; % SET BOOLEAN RIGHT DOOR TO TRUE
         
     end
 end
@@ -106,12 +101,10 @@ if ~isempty(nearby_door_left)%  If left door
             distance_to_wall= 1670 + leftpoints(n,1);
         end
         leftpoints(n,1)
-        if distance_to_wall == 0
+        if distance_to_wall == 0 % if rightdoor is detected, use this correction
             distance_to_wall = 835;
         end
         %distance_to_door = leftpoints(n,2);
-        L_index = n;
-        
         detect_door_left = true; % SET GLOBAL LEFT DOOR TO TRUE
   
     end
@@ -135,42 +128,16 @@ if ~isempty(nearby_door_front)
             end
             if distance_to_door < door_distance_front
                 detect_door_front = true;
-                distance_to_door = distance_to_door - 835 - 70; % distance_to_door- half of hall - door
-                distance_to_wall = 835;
+                %distance_to_door = distance_to_door - 835 - 70; %
+                %distance_to_door- half of hall - door indent
+                distance_to_wall = 835; % Do not correct for the case of front door.
             end
         end
-        %{
-        for q = 1:length(front_points(:,1))-2
-            norm_front(q) = norm(front_points(q,:)-front_points(q+2,:));
-            if norm_front(q) > door_threshold     % Find first maxnorm on rightwall
-                Y= norm_front(q);
-                % Save start position of door
-                front_door = [front_points(q,1),front_points(q,2)];
-                break
-            end
-        end
-    % If the distance to the door is less than door_distance, we
-    % want a DOOR event to occur, and list the door as detected
-    if norm(front_door(2))>0 && norm(front_door(2))< door_distance_front
-        F_index =q; % used for plotting
-        detect_door_front = true; % SET GLOBAL RIGHT DOOR TO TRUE
-        distance_to_door = front_points(q,2);
-        %set_door_detected(nearby_door_front(5))% SET DOOR TO FOUND
-    end
-        %}
     end
 end
 
 
 % Booleans that execute an event in cause of true
 door_bol = [detect_door_left, detect_door_right, detect_door_front, distance_to_wall,distance_to_door];
-
-% Plot rangescan and doors found
-%plot(leftpoints);
-%if L_index ~=0
-%    plot(leftpoints(L_index,1),leftpoints(L_index,2),'*');
-%end
-%filename = "plotdoor" + num2str(R_index) +".fig";
-%savefig(filename)
 
 end
