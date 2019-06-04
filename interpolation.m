@@ -28,7 +28,7 @@ StopPoints = [
     
     Waypoints = [x,y];
 
-dlmwrite('PerfectPathHall.txt', Waypoints,'newline','pc');
+%dlmwrite('PerfectPathHall.txt', Waypoints,'newline','pc');
 
 % FOR STARTING AT LAB
 StopPoints = [2,3
@@ -63,9 +63,9 @@ StopPoints = [2,3
     y= (yy -StopPoints(1,2))';
     
     Waypoints = [x,y];
-d = dlmread('Doors_edit.txt');
-plot(d(:,1)/1000,d(:,2)/1000,'o')
+d = dlmread('Doors.txt');
+plot(d(:,1)/1000,d(:,2)/1000,'r*')
 
 hold off
 
-dlmwrite('PerfectPathLab.txt', Waypoints,'newline','pc');
+%dlmwrite('PerfectPathLab.txt', Waypoints,'newline','pc');
