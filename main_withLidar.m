@@ -32,7 +32,6 @@ y_real=odometry(2);
 door_detected_right = false;
 door_detected_left = false;
 door_detected_front = false;
-theta_correction=0;
 
 doors = dlmread('Doors.txt');
 reference_path = dlmread('5thfloor_path.txt');
@@ -41,7 +40,6 @@ driveLab(sp,1);
 
 reference_path(:,1)=reference_path(:,1)*1000+odometry(1);
 reference_path(:,2)=reference_path(:,2)*1000+odometry(2);
-%dlmwrite('test11corrected.txt', reference_path,'newline','pc');
 
 x_ref = reference_path(:,1);
 y_ref = reference_path(:,2);
@@ -55,18 +53,13 @@ theta_ref(length(x_ref)) = theta_ref(length(x_ref)-1);
 for h =1:length(reference_path(:,1))
     number = h;
     ref = reference_path(h,1:2);
-    disp(odometry)
-    disp(ref)
-    disp(norm(odometry(1:2)-ref))
     if changeReference(h,ref,x_real,y_real)
         fprintf('POINT REACHED: %d', h)
         continue
     end
     while norm([x_real,y_real]-ref)>150
-        
         nearby_doors = doors_in_range(doors,[x_real,y_real]);
         if ~isempty(nearby_doors)
-            %disp('in nearby doors');
             rangescan = LidarScan(lidar);
             LD_result = lidarDoor(nearby_doors,rangescan);
             door_detected_left = LD_result(1);
@@ -84,8 +77,6 @@ for h =1:length(reference_path(:,1))
             res = control_system(ref,theta_ref,h);
             x_real=res(3);
             y_real=res(4);
-            vlist = [vlist,res(1)+150];
-            wlist = [wlist,res(2)];
             pioneer_set_controls(sp,res(1)+150,res(2));
         else
             if door_detected_front
@@ -131,11 +122,6 @@ for h =1:length(reference_path(:,1))
     end
     %fprintf('POINT REACHED: %d', h)
 end
-
-figure(1)
-plot(vlist);
-figure(2)
-plot(wlist);
 
 driveLab(sp,2);
 delete(odometrytmr);
